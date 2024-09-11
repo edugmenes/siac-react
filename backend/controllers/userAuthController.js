@@ -5,12 +5,11 @@ const userAuthModel = require('../models/userAuthModel');
 // Função de login:
 const userLogin = async (request, response) => {
     const { email, password } = request.body;
-    console.log('Requisição recebida no backend: ', request.body);
+    console.log('Requisição recebida no backend!');
 
     try {
         // Verifique se o usuário existe e email:
         const user = await userAuthModel.getUserByEmail(email);
-        console.log(user)
         if (!user) {
             return response.status(401).json({ message: 'Email não cadastrado!' });
         }
@@ -34,7 +33,7 @@ const userLogin = async (request, response) => {
 
         // Gerar o token JWT:
         const token = jwt.sign(
-            { idUser: user.idUser, profile, permissions },
+            { idUser: user.idUser, userName: user.nome, profile, permissions },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );

@@ -3,12 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login/index.jsx";
 import Home from "./pages/Home/index.jsx";
 import PageLayout from "./components/PageLayout.jsx";
-import Settings from "./pages/Settings";
-import Painel from "./pages/Painel";
-import Documents from "./pages/Documents";
-import Bin from "./pages/Help";
+import Settings from "./pages/Settings.jsx";
+import Painel from "./pages/Painel.jsx";
+import Documents from "./pages/Documents.jsx";
+import Bin from "./pages/Help.jsx";
 import Appointments from "./pages/Appointments/index.jsx";
-import AppointmentSchedule from "./pages/Appointments/AppointmentSchedule";
+import AppointmentSchedule from "./pages/Appointments/AppointmentSchedule.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
 const ProtectedRoute = ({ element: Element, ...rest }) => {

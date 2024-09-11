@@ -1,18 +1,19 @@
 import React from "react";
 import CardComponent from "../../components/Card";
-import scheduleImage from "../../images/1.webp";
+import calendarImage from "../../images/calendar-button.png";
+import scheduleImage from "../../images/notes-button.png";
 
 const Home = () => {
   return (
     <div style={{ display: "flex" }}>
       <CardComponent
         title="Agendar Consultas"
-        pathImage={scheduleImage}
+        pathImage={calendarImage}
         redirectPath="/appointments/schedule"
       />
       <CardComponent
         title="Criar Agendas"
-        pathImage={scheduleImage}
+        pathImage={calendarImage}
         redirectPath="/painel"
       />
       <CardComponent

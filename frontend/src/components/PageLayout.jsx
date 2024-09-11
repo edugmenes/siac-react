@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, Button, Dropdown, Layout, Menu, Space } from "antd";
 import { Link, Outlet } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import {
   AppstoreOutlined,
   DeleteOutlined,
   DownOutlined,
+  EditOutlined,
   FolderOutlined,
   HomeOutlined,
+  LogoutOutlined,
+  QuestionCircleOutlined,
   ScheduleOutlined,
   SettingOutlined,
   UserOutlined,
@@ -54,99 +58,118 @@ const menuItems = [
 ];
 
 const handleLogout = () => {
-  localStorage.removeItem('authToken'); // Remover o token específico
-  window.location.href = '/login';  // Redirecionar para a página de login
+  localStorage.removeItem("authToken"); // Remover o token específico
+  window.location.href = "/login"; // Redirecionar para a página de login
 };
 
 const userMenu = (
   <Menu>
-    <Menu.Item key="1" style={{ padding: 0 }}>
-      <Button
-        type="text"
-        onClick={handleLogout}
-        style={{ width: "100%", textAlign: "center", padding: "10px 0" }}
-      >
-        Sair
-      </Button>
+    <Menu.Item key="1" icon={<EditOutlined />}>
+      Editar Perfil
+    </Menu.Item>
+    <Menu.Item key="2" icon={<QuestionCircleOutlined />}>
+      Ajuda
+    </Menu.Item>
+    <Menu.Item key="3" icon={<LogoutOutlined />} danger onClick={handleLogout}>
+      Sair
     </Menu.Item>
   </Menu>
 );
 
-const pageLayout = ({ children }) => (
-  <Layout>
-    <Header
-      className="header"
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        backgroundColor: "#001529",
-        padding: "0 20px",
-      }}
-    >
-      <h1
+const PageLayout = () => {
+  const [userName, setUserName] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token); // Decodifica o token
+        setUserName(decodedToken.userName); // Armazena o nome do usuário
+      } catch (error) {
+        console.error(
+          "Erro ao decodificar token para obter nome de usuário: ",
+          error
+        );
+      }
+    }
+  }, []);
+
+  return (
+    <Layout>
+      <Header
+        className="header"
         style={{
-          margin: "0",
-          color: "#fff",
-          fontSize: "40px",
-          marginLeft: "40px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backgroundColor: "#001529",
+          padding: "0 20px",
         }}
       >
-        SIAC
-      </h1>
-
-      <Dropdown overlay={userMenu} trigger={["click"]}>
-        <button
-          onClick={(e) => e.preventDefault()}
+        <h1
           style={{
+            margin: "0",
             color: "#fff",
-            background: "none",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            textDecoration: "none",
-            cursor: "pointer",
+            fontSize: "40px",
+            marginLeft: "40px",
           }}
         >
-          <Space>
-            <Avatar icon={<UserOutlined />} />
-            <span>Henrique Augusto Debia</span>
-            <DownOutlined />
-          </Space>
-        </button>
-      </Dropdown>
-    </Header>
-    <Layout>
-      <Sider width={230} className="site-layout-background">
-        <Menu
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          style={{ height: "100%", borderRight: 0 }}
-        >
-          {menuItems.map((item) => (
-            <Menu.Item key={item.key} icon={item.icon}>
-              <Link to={item.link}>{item.label}</Link>
-            </Menu.Item>
-          ))}
-        </Menu>
-      </Sider>
-      <Layout style={{ padding: "0 24px 24px" }}>
-        <Content
-          className="site-layout-background"
-          style={{
-            padding: 24,
-            margin: 0,
-            minHeight: 600,
-          }}
-        >
-          <Outlet />
-        </Content>
-        <Footer style={{ textAlign: "center" }}>
-          SIAC ©{new Date().getFullYear()} Todos os direitos reservados.
-        </Footer>
+          SIAC
+        </h1>
+
+        <Dropdown overlay={userMenu} trigger={["click"]}>
+          <button
+            onClick={(e) => e.preventDefault()}
+            style={{
+              color: "#fff",
+              background: "none",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              cursor: "pointer",
+            }}
+          >
+            <Space>
+              <Avatar icon={<UserOutlined />} />
+              <span>{userName || "Usuário"}</span>
+              <DownOutlined />
+            </Space>
+          </button>
+        </Dropdown>
+      </Header>
+      <Layout>
+        <Sider width={230} className="site-layout-background">
+          <Menu
+            mode="inline"
+            defaultSelectedKeys={["1"]}
+            style={{ height: "100%", borderRight: 0 }}
+          >
+            {menuItems.map((item) => (
+              <Menu.Item key={item.key} icon={item.icon}>
+                <Link to={item.link}>{item.label}</Link>
+              </Menu.Item>
+            ))}
+          </Menu>
+        </Sider>
+        <Layout style={{ padding: "0 24px 24px" }}>
+          <Content
+            className="site-layout-background"
+            style={{
+              padding: 24,
+              margin: 0,
+              minHeight: 600,
+            }}
+          >
+            <Outlet />
+          </Content>
+          <Footer style={{ textAlign: "center" }}>
+            SIAC ©{new Date().getFullYear()} Todos os direitos reservados.
+          </Footer>
+        </Layout>
       </Layout>
     </Layout>
-  </Layout>
-);
+  );
+};
 
-export default pageLayout;
+export default PageLayout;

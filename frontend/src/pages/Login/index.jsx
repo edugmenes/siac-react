@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import psychologyImage from "../../images/psychology2.png";
+import psychologyImage from "../../images/login-background.jpg";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiLogin } from "../../api/userAuthentication";
@@ -45,7 +45,7 @@ const Login = () => {
                   className="fw-medium mb-2 pb-2"
                   style={{ fontSize: "1.5em" }}
                 >
-                  Log In
+                  Entrar
                 </h3>
 
                 <div data-mdb-input-init className="form-outline mb-2">
@@ -61,7 +61,7 @@ const Login = () => {
                   />
                   <label
                     className="form-label"
-                    for="form2Example18"
+                    htmlFor="form2Example18"
                     style={{ fontSize: "1em" }}
                   >
                     Endereço de email
@@ -81,7 +81,7 @@ const Login = () => {
                   />
                   <label
                     className="form-label"
-                    for="form2Example28"
+                    htmlFor="form2Example28"
                     style={{ fontSize: "1em" }}
                   >
                     Senha

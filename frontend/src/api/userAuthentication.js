@@ -20,7 +20,7 @@ const apiLogin = async (email, password) => {
 
         return data;
     } catch (error) {
-        console.error('Falha no login:', error);
+        console.error('Falha no login: ', error);
         throw error;
     }
 };
