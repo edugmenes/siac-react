@@ -1,6 +1,6 @@
 import React from "react";
-import CardComponent from "../components/Card";
-import scheduleImage from "../images/1.webp";
+import CardComponent from "../../components/Card";
+import scheduleImage from "../../images/1.webp";
 
 const Home = () => {
   return (

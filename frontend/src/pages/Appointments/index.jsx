@@ -58,7 +58,7 @@ const Appointments = () => {
       key: "professional",
     },
     {
-      // TODO: tratar coluna status
+      // TODO: Tratar coluna status
       title: "Status",
       dataIndex: "status",
       key: "status",

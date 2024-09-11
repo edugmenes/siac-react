@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login/index.jsx";
-import Home from "./pages/Home";
-import PageLayout from "./pages/PageLayout.js";
+import Home from "./pages/Home/index.jsx";
+import PageLayout from "./components/PageLayout.jsx";
 import Settings from "./pages/Settings";
 import Painel from "./pages/Painel";
 import Documents from "./pages/Documents";
 import Bin from "./pages/Help";
-import Appointments from "./pages/Appointments/Appointments";
+import Appointments from "./pages/Appointments/index.jsx";
 import AppointmentSchedule from "./pages/Appointments/AppointmentSchedule";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
