@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login/index.jsx";
+import ForgotPassword from "./pages/Login/ForgotPassword.jsx";
+import RegisterUser from "./pages/Login/RegisterUser.jsx";
 import Home from "./pages/Home/index.jsx";
 import PageLayout from "./components/PageLayout.jsx";
 import Settings from "./pages/Settings.jsx";
@@ -19,7 +21,12 @@ const ProtectedRoute = ({ element: Element, ...rest }) => {
 const App = () => (
   <BrowserRouter>
     <Routes>
+      {/* Rotas de login e autenticação: */}
       <Route path="/login" element={<Login />} />
+      <Route path="register-user" element={<RegisterUser />} />
+      <Route path="forgot-password" element={<ForgotPassword />} />
+
+      {/* Rotas protegidas (apenas para usuários cadastrados e autenticados/logados): */}
       <Route path="/" element={<ProtectedRoute element={PageLayout} />}>
         <Route index element={<ProtectedRoute element={Home} />} />
         <Route path="painel" element={<ProtectedRoute element={Painel} />} />

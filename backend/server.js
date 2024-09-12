@@ -14,7 +14,6 @@ app.use(cors({
 // Middleware de conversão JSON:
 app.use(express.json());
 
-// 
 app.use('/auth', userAuthRoute);
 
 // Inicializa servidor:

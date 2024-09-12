@@ -34,7 +34,7 @@ const userLogin = async (request, response) => {
         // Gerar o token JWT:
         const token = jwt.sign(
             { idUser: user.idUser, userName: user.nome, profile, permissions },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET_KEY,
             { expiresIn: '1h' }
         );
 

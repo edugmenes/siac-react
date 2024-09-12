@@ -1,135 +1,138 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import psychologyImage from "../../images/login-background.jpg";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Button, Checkbox, Form, Input, Grid, Typography } from "antd";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { useNavigate, Link } from "react-router-dom";
 import { apiLogin } from "../../api/userAuthentication";
+import backgroundImage from "../../images/login-background.jpg";
+
+const { useBreakpoint } = Grid;
+const { Title, Text } = Typography;
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const onFinish = async (values) => {
     try {
-      await apiLogin(email, password);
+      await apiLogin(values.email, values.password);
       alert("Sucesso no login!");
-      navigate("/"); // Redirect to home page after successful login
+      navigate("/"); // Redireciona para a página inicial após o login bem-sucedido
     } catch (error) {
       alert("Falha no login.");
     }
   };
 
   return (
-    <section className="vh-100">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-5 text-black">
-            <div className="px-4 ms-xl-4">
-              <i
-                className="fas fa-crosw fa-2x me-3 pt-5 mt-xl-4"
-                style={{ color: "#709085" }}
-              ></i>
-              <p className="h1 fw-semibold mb-0" style={{ fontSize: "3.5em" }}>
-                SIAC
-              </p>
-              <p className="h5 fw-light mt-2" style={{ fontSize: "1.1em" }}>
-                Sistema Integrado de Atendimento às Clínicas
-              </p>
-            </div>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "left",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          backgroundColor: "white",
+          padding: "40px",
+          borderRadius: "10px",
+        }}
+      >
+        <Title
+          level={2}
+          style={{
+            textAlign: "center",
+            marginBottom: "10px",
+            fontSize: "40px",
+            fontWeight: "semi-bold",
+          }}
+        >
+          SIAC
+        </Title>
+        <Text
+          type="secondary"
+          style={{
+            textAlign: "center",
+            display: "block",
+            marginBottom: "20px",
+          }}
+        >
+          Sistema Integrado de Atendimento às Clínicas
+        </Text>
+        <Text
+          style={{
+            textAlign: "center",
+            display: "block",
+            marginBottom: "20px",
+            fontSize: "15px",
+          }}
+        >
+          Entrar
+        </Text>
 
-            <div className="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
-              <form style={{ width: "23rem" }} onSubmit={handleSubmit}>
-                <h3
-                  className="fw-medium mb-2 pb-2"
-                  style={{ fontSize: "1.5em" }}
-                >
-                  Entrar
-                </h3>
-
-                <div data-mdb-input-init className="form-outline mb-2">
-                  <input
-                    id="form2Example18"
-                    className="form-control form-control-lg"
-                    style={{ fontSize: "1em" }}
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    required
-                  />
-                  <label
-                    className="form-label"
-                    htmlFor="form2Example18"
-                    style={{ fontSize: "1em" }}
-                  >
-                    Endereço de email
-                  </label>
-                </div>
-
-                <div data-mdb-input-init className="form-outline mb-4">
-                  <input
-                    id="form2Example28"
-                    className="form-control form-control-lg"
-                    style={{ fontSize: "1em" }}
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    required
-                  />
-                  <label
-                    className="form-label"
-                    htmlFor="form2Example28"
-                    style={{ fontSize: "1em" }}
-                  >
-                    Senha
-                  </label>
-                </div>
-
-                <div className="pt-1 mb-3">
-                  <button
-                    data-mdb-button-init
-                    data-mdb-ripple-init
-                    className="btn btn-info btn-lg btn-block"
-                    style={{
-                      backgroundColor: "#1a73e8",
-                      color: "white",
-                      borderColor: "white",
-                    }}
-                    type="sumbit"
-                  >
-                    Log In
-                  </button>
-                </div>
-
-                <p className="small mb-4 pb-lg-2">
-                  <a className="text-muted" href="#!">
-                    Esqueceu a senha?
-                  </a>
-                </p>
-                <p>
-                  Ainda não tem conta?{" "}
-                  <a href="#!" className="link-info">
-                    Cadastre-se aqui
-                  </a>
-                </p>
-              </form>
-            </div>
-          </div>
-
-          <div className="col-sm-7 px-0 d-none d-sm-block">
-            <img
-              src={psychologyImage}
-              alt="Login image"
-              className="w-100 vh-100"
-              style={{ objectFit: "cover", objectPosition: "left" }}
+        <Form
+          name="login"
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          layout="vertical"
+        >
+          <Form.Item
+            name="email"
+            rules={[{ required: true, message: "Por favor insira seu email!" }]}
+          >
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              size="large"
             />
-          </div>
-        </div>
+          </Form.Item>
+
+          <Form.Item
+            name="password"
+            rules={[{ required: true, message: "Por favor insira sua senha!" }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Checkbox>Lembrar-me</Checkbox>
+            </Form.Item>
+
+            <Link to="/forgot-password" style={{ float: "right" }}>
+              Esqueceu a senha?
+            </Link>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" size="large" block>
+              Log In
+            </Button>
+          </Form.Item>
+
+          <Form.Item>
+            <Text type="secondary">
+              Ainda não tem conta?{" "}
+              <Link to="/register-user">Cadastre-se aqui</Link>
+            </Text>
+          </Form.Item>
+        </Form>
       </div>
-    </section>
+    </div>
   );
 };
 
