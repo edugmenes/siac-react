@@ -45,7 +45,7 @@ const Login = () => {
         }}
       >
         <Title
-          level={2}
+          level={1}
           style={{
             textAlign: "center",
             marginBottom: "10px",

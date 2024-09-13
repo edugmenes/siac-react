@@ -1,246 +1,287 @@
-import React from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Button, Form, Input, Row, Col, Typography, Select } from "antd";
-import backgroundImage from "../../images/register-background.jpg"; // Importe a imagem
-import { apiRegister } from "../../api/userAuthentication.js";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Col, Form, Row, Typography } from "antd";
+import { TextLabel, DropdownLabel } from "../../components/InputLabel"; // Atualize o caminho conforme necessário
+import {
+  LeftOutlined,
+  RightOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons";
+import { apiRegister } from "../../api/userAuthentication";
+import backgroundImage from "../../images/login-background-v2.jpg"; // Atualize o caminho para a imagem
 
 const { Item } = Form;
 const { Title } = Typography;
-const { Option } = Select; // Importa o componente Option para o Select
 
 const RegisterUser = () => {
   const [form] = Form.useForm();
+  const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
+
+  const handleNext = () => {
+    form
+      .validateFields()
+      .then(() => {
+        setCurrentStep(currentStep + 1);
+      })
+      .catch(() => {
+        // Se houver erros de validação, o usuário não avançará para a próxima etapa
+      });
+  };
+
+  const handlePrevious = () => {
+    setCurrentStep(currentStep - 1);
+  };
 
   const handleSubmit = async (registerFormValues) => {
     try {
       await apiRegister(registerFormValues);
       alert("Usuário cadastrado!");
-      navigate("/"); // Redireciona para a página inicial após o login bem-sucedido
+      navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
       alert("Falha no cadastro.");
     }
   };
 
   return (
-    <Row
-      gutter={16}
-      style={{
-        maxWidth: 1200,
-        margin: "0 auto",
-        minHeight: "100vh",
-        alignItems: "center",
-      }}
-    >
-      <Col span={14}>
-        <div
+    <Row style={{ height: "100vh" }}>
+      <Col
+        span={12}
+        style={{
+          backgroundColor: "#fff",
+          padding: "2rem",
+          boxSizing: "border-box",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Button
+          type="link"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate("/login")}
           style={{
-            padding: "2rem",
-            backgroundColor: "#fff",
-            borderRadius: "8px",
+            position: "absolute",
+            top: "1rem",
+            left: "1rem",
+            fontSize: "1rem",
           }}
         >
-          <Title
-            level={3} // Diminuir o tamanho do título
-            style={{ textAlign: "center", marginBottom: "2rem" }}
-          >
-            Cadastre-se
-          </Title>
-
-          <Form
-            form={form}
-            name="register"
-            onFinish={handleSubmit}
-            initialValues={{ prefix: "86" }}
-            scrollToFirstError
-          >
-            <Row gutter={8}>
-              <Col span={24}>
-                <Item
-                  name="nome"
-                  label="Nome Completo"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, insira seu nome completo!",
-                    },
-                  ]}
-                >
-                  <Input placeholder="Nome Completo" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="email"
-                  label="E-mail"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      type: "email",
-                      message: "O e-mail inserido não é válido!",
-                    },
-                    {
-                      required: true,
-                      message: "Por favor, insira seu e-mail!",
-                    },
-                  ]}
-                >
-                  <Input placeholder="E-mail" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="nomeUser"
-                  label="Nome de Usuário"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, insira o nome de usuário!",
-                    },
-                  ]}
-                >
-                  <Input placeholder="Nome de Usuário" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="perfil"
-                  label="Perfil"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, selecione o perfil!",
-                    },
-                  ]}
-                >
-                  <Select placeholder="Selecione o Perfil">
-                    <Option value="paciente">Paciente</Option>
-                    <Option value="professor">Professor</Option>
-                    <Option value="recepcionista">Recepcionista</Option>
-                    <Option value="administrador">Administrador</Option>
-                    <Option value="psicologo">Psicólogo</Option>
-                  </Select>
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="data_nascimento"
-                  label="Data de Nascimento"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, insira sua data de nascimento!",
-                    },
-                  ]}
-                >
-                  <Input type="date" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="cep"
-                  label="CEP"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    { required: true, message: "Por favor, insira seu CEP!" },
-                  ]}
-                >
-                  <Input placeholder="CEP" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="endereco"
-                  label="Endereço"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, insira seu endereço!",
-                    },
-                  ]}
-                >
-                  <Input placeholder="Endereço" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="telefone"
-                  label="Telefone"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    {
-                      required: false,
-                      message: "Por favor, insira seu telefone!",
-                    },
-                  ]}
-                >
-                  <Input placeholder="Telefone" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="password"
-                  label="Senha"
-                  style={{ marginBottom: "8px" }}
-                  rules={[
-                    { required: true, message: "Por favor, insira sua senha!" },
-                  ]}
-                  hasFeedback
-                >
-                  <Input.Password placeholder="Senha" />
-                </Item>
-              </Col>
-              <Col span={24}>
-                <Item
-                  name="passwordToCompare"
-                  label="Confirmar Senha"
-                  dependencies={["password"]}
-                  style={{ marginBottom: "8px" }}
-                  hasFeedback
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor, confirme sua senha!",
-                    },
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        if (!value || getFieldValue("password") === value) {
-                          return Promise.resolve();
-                        }
-                        return Promise.reject(
-                          new Error("As senhas inseridas não correspondem!")
-                        );
+          Voltar para Login
+        </Button>
+        <Title level={2} style={{ textAlign: "center", marginBottom: "2rem" }}>
+          Junte-se a nós e cadastre-se!
+        </Title>
+        <Form
+          form={form}
+          name="register"
+          onFinish={handleSubmit}
+          initialValues={{ prefix: "86" }}
+          scrollToFirstError
+          style={{ width: "100%", maxWidth: "600px" }}
+        >
+          <Row gutter={8}>
+            {currentStep === 1 && (
+              <>
+                <Col span={24}>
+                  <TextLabel
+                    name="nome"
+                    label="Nome Completo"
+                    placeholder="Nome Completo"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, insira seu nome completo!",
                       },
-                    }),
-                  ]}
+                    ]}
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="data_nascimento"
+                    label="Data de Nascimento"
+                    placeholder="Data de Nascimento"
+                    type="date"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, insira sua data de nascimento!",
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="telefone"
+                    label="Telefone"
+                    placeholder="Telefone"
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="cep"
+                    label="CEP"
+                    placeholder="CEP"
+                    rules={[
+                      { required: true, message: "Por favor, insira seu CEP!" },
+                    ]}
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="endereco"
+                    label="Endereço"
+                    placeholder="Endereço"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, insira seu endereço!",
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col
+                  span={24}
+                  style={{ textAlign: "center", marginTop: "1rem" }}
                 >
-                  <Input.Password placeholder="Confirmar Senha" />
-                </Item>
-              </Col>
-              <Col span={24} style={{ textAlign: "center" }}>
-                <Item>
+                  <Button
+                    type="default"
+                    icon={<RightOutlined />}
+                    onClick={handleNext}
+                  >
+                    Avançar
+                  </Button>
+                </Col>
+              </>
+            )}
+
+            {currentStep === 2 && (
+              <>
+                <Col span={24}>
+                  <TextLabel
+                    name="nomeUser"
+                    label="Nome de Usuário"
+                    placeholder="Nome de Usuário"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, insira o nome de usuário!",
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="email"
+                    label="E-mail"
+                    placeholder="E-mail"
+                    rules={[
+                      {
+                        type: "email",
+                        message: "O e-mail inserido não é válido!",
+                      },
+                      {
+                        required: true,
+                        message: "Por favor, insira seu e-mail!",
+                      },
+                    ]}
+                  />
+                </Col>
+                <Col span={24}>
+                  <DropdownLabel
+                    name="perfil"
+                    label="Perfil"
+                    placeholder="Selecione o Perfil"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, selecione o perfil!",
+                      },
+                    ]}
+                    options={[
+                      { value: "paciente", label: "Paciente" },
+                      { value: "professor", label: "Professor" },
+                      { value: "recepcionista", label: "Recepcionista" },
+                      { value: "administrador", label: "Administrador" },
+                      { value: "psicologo", label: "Psicólogo" },
+                    ]}
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="password"
+                    label="Senha"
+                    placeholder="Senha"
+                    type="password"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, insira sua senha!",
+                      },
+                    ]}
+                    hasFeedback
+                  />
+                </Col>
+                <Col span={24}>
+                  <TextLabel
+                    name="passwordToCompare"
+                    label="Confirmar Senha"
+                    placeholder="Confirmar Senha"
+                    type="password"
+                    dependencies={["password"]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor, confirme sua senha!",
+                      },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue("password") === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error("As senhas inseridas não correspondem!")
+                          );
+                        },
+                      }),
+                    ]}
+                    hasFeedback
+                  />
+                </Col>
+                <Col
+                  span={24}
+                  style={{ textAlign: "center", marginTop: "1rem" }}
+                >
+                  <Button
+                    type="default"
+                    icon={<LeftOutlined />}
+                    onClick={handlePrevious}
+                    style={{ marginRight: "8px" }}
+                  >
+                    Voltar
+                  </Button>
                   <Button type="primary" htmlType="submit">
                     Registrar
                   </Button>
-                </Item>
-              </Col>
-            </Row>
-          </Form>
-        </div>
+                </Col>
+              </>
+            )}
+          </Row>
+        </Form>
       </Col>
-
-      <Col span={10}>
-        <img
-          src={backgroundImage} // Use a imagem importada
-          alt="Cadastro Imagem"
-          style={{ width: "95%", height: "90%", objectFit: "cover" }}
-        />
-      </Col>
+      <Col
+        span={12}
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "right",
+          backgroundAttachment: "fixed",
+          height: "100%",
+          position: "relative",
+        }}
+      />
     </Row>
   );
 };
