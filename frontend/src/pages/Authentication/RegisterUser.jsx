@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button, Form, Input, Row, Col, Typography, Select } from "antd";
 import backgroundImage from "../../images/register-background.jpg"; // Importe a imagem
-import { apiRegister } from "../../api/userRegistration.js";
+import { apiRegister } from "../../api/userAuthentication.js";
 
 const { Item } = Form;
 const { Title } = Typography;
@@ -59,7 +59,7 @@ const RegisterUser = () => {
                 <Item
                   name="nome"
                   label="Nome Completo"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       required: true,
@@ -74,7 +74,7 @@ const RegisterUser = () => {
                 <Item
                   name="email"
                   label="E-mail"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       type: "email",
@@ -93,7 +93,7 @@ const RegisterUser = () => {
                 <Item
                   name="nomeUser"
                   label="Nome de Usuário"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       required: true,
@@ -108,7 +108,7 @@ const RegisterUser = () => {
                 <Item
                   name="perfil"
                   label="Perfil"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       required: true,
@@ -129,7 +129,7 @@ const RegisterUser = () => {
                 <Item
                   name="data_nascimento"
                   label="Data de Nascimento"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       required: true,
@@ -144,7 +144,7 @@ const RegisterUser = () => {
                 <Item
                   name="cep"
                   label="CEP"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     { required: true, message: "Por favor, insira seu CEP!" },
                   ]}
@@ -156,7 +156,7 @@ const RegisterUser = () => {
                 <Item
                   name="endereco"
                   label="Endereço"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       required: true,
@@ -171,7 +171,7 @@ const RegisterUser = () => {
                 <Item
                   name="telefone"
                   label="Telefone"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     {
                       required: false,
@@ -186,7 +186,7 @@ const RegisterUser = () => {
                 <Item
                   name="password"
                   label="Senha"
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  style={{ marginBottom: "8px" }}
                   rules={[
                     { required: true, message: "Por favor, insira sua senha!" },
                   ]}
@@ -199,8 +199,8 @@ const RegisterUser = () => {
                 <Item
                   name="passwordToCompare"
                   label="Confirmar Senha"
-                  dependencies={["senha"]}
-                  style={{ marginBottom: "8px" }} // Diminui o espaço abaixo do input
+                  dependencies={["password"]}
+                  style={{ marginBottom: "8px" }}
                   hasFeedback
                   rules={[
                     {
@@ -209,7 +209,7 @@ const RegisterUser = () => {
                     },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
-                        if (!value || getFieldValue("senha") === value) {
+                        if (!value || getFieldValue("password") === value) {
                           return Promise.resolve();
                         }
                         return Promise.reject(

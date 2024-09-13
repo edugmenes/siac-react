@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login/index.jsx";
-import ForgotPassword from "./pages/Login/ForgotPassword.jsx";
-import RegisterUser from "./pages/Login/RegisterUser.jsx";
-import Home from "./pages/Home/index.jsx";
+import Login from "./pages/Authentication/Login.jsx";
+import ForgotPassword from "./pages/Authentication/ForgotPassword.jsx";
+import RegisterUser from "./pages/Authentication/RegisterUser.jsx";
+import Home from "./pages/Home/Home.jsx";
 import PageLayout from "./components/PageLayout.jsx";
 import Settings from "./pages/Settings.jsx";
 import Painel from "./pages/Painel.jsx";

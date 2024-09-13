@@ -46,6 +46,12 @@ const userLogin = async (request, response) => {
     }
 };
 
+// Função de cadastro de usuário:
+const userRegistration = async (request, response) => {
+    console.log('Requisição recebida no backend!');
+}
+
 module.exports = {
-    userLogin
+    userLogin,
+    userRegistration
 };
