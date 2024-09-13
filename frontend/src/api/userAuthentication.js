@@ -2,7 +2,7 @@ const backendUrl = 'http://localhost:5000';
 
 const apiLogin = async (email, password) => {
     try {
-        const response = await fetch(`${backendUrl}/user/login`, {
+        const response = await fetch(`${backendUrl}/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
