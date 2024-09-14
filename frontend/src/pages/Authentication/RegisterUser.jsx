@@ -35,7 +35,15 @@ const RegisterUser = () => {
 
   const handleSubmit = async (registerFormValues) => {
     try {
-      await apiRegister(registerFormValues);
+      const perfilSelecionado = registerFormValues.perfil;
+      const [key, label] = perfilSelecionado.split("|");
+      const formattedData = {
+        ...registerFormValues,
+        perfilId: key,
+        perfilLabel: label,
+      };
+      console.log(formattedData)
+      await apiRegister(formattedData);
       notification.success({
         message: 'Sucesso',
         description: 'Usuário cadastrado com sucesso!',
@@ -206,11 +214,11 @@ const RegisterUser = () => {
                       },
                     ]}
                     options={[
-                      { value: "paciente", label: "Paciente" },
-                      { value: "professor", label: "Professor" },
-                      { value: "recepcionista", label: "Recepcionista" },
-                      { value: "administrador", label: "Administrador" },
-                      { value: "psicologo", label: "Psicólogo" },
+                      { value: "2|paciente", label: "Paciente" },
+                      { value: "4|professor", label: "Professor" },
+                      { value: "3|recepcionista", label: "Recepcionista" },
+                      { value: "1|administrador", label: "Administrador" },
+                      { value: "5|psicologo", label: "Psicólogo" },
                     ]}
                   />
                 </Col>
