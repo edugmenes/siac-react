@@ -40,7 +40,15 @@ const RegisterUser = () => {
     // Combina os dados da segunda etapa com os da primeira
     const combinedData = { ...formData, ...values };
     try {
-      await apiRegister(registerFormValues);
+      const perfilSelecionado = registerFormValues.perfil;
+      const [key, label] = perfilSelecionado.split("|");
+      const formattedData = {
+        ...registerFormValues,
+        perfilId: key,
+        perfilLabel: label,
+      };
+      console.log(formattedData)
+      await apiRegister(formattedData);
       notification.success({
         message: 'Sucesso',
         description: 'Usuário cadastrado com sucesso!',
