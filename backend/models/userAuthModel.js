@@ -54,6 +54,11 @@ const registerUserData = async (registerFormData) => {
             [nomeUser, email, password, perfilLabel, perfilId]
         );
 
+        const [usuarioPerfil] = await promisePool.query(
+            `INSERT INTO usuario_perfil (id_usuario, id_perfil) VALUES (?, ?)`,
+            [result.insertId, perfilId]
+        );
+
         if (result.affectedRows > 0) {
             return {
                 success: true,
