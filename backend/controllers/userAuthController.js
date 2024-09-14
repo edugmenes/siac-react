@@ -48,24 +48,18 @@ const userLogin = async (request, response) => {
 
 // Função de cadastro de usuário:
 const userRegistration = async (request, response) => {
-    console.log('Requisição recebida no backend!');
-    console.log(request.body);
-    const data = request.body;
+  const { body } = request;
+	try {
+		await userAuthModel.registerUserData(body)
+		return response.status(201).json({ message: 'Usuário cadastrado com sucesso!' })
+	} catch (error) {
+		if(error.message.includes('Email já cadastrado.')) {
+			return response.status(400).json({ message: error.message })
+		}
 
-    try {
-        // Verifique se o usuário já está cadastrado:
-        const user = await userAuthModel.getUserByEmail(data.email);
-        if (user) {
-            return response.status(401).json({ message: 'Email já cadastrado!' });
-        }
-        else {
-            return true;
-        }
-    } catch (error) {
-        console.error('Erro no processo de autenticação: ', error);
-        return response.status(500).json({ message: 'Erro no processo de autenticação.' });
-    }
-}
+		return response.status(500).json({ message: 'Erro na criação de usuário' })
+	}
+};
 
 module.exports = {
     userLogin,

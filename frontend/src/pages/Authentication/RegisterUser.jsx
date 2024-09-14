@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Row, Typography, notification } from "antd";
-import { TextLabel, DropdownLabel } from "../../components/InputLabel";
+import { TextLabel, DropdownLabel } from "../../components/InputLabel"; // Atualize o caminho conforme necessário
 import {
   LeftOutlined,
   RightOutlined,
@@ -40,8 +40,11 @@ const RegisterUser = () => {
     // Combina os dados da segunda etapa com os da primeira
     const combinedData = { ...formData, ...values };
     try {
-      await apiRegister(combinedData);
-      alert("Usuário cadastrado!");
+      await apiRegister(registerFormValues);
+      notification.success({
+        message: 'Sucesso',
+        description: 'Usuário cadastrado com sucesso!',
+      });
       navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
       notification.error({
