@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Form, Row, Typography } from "antd";
+import { Button, Col, Form, Row, Typography, notification } from "antd";
 import { TextLabel, DropdownLabel } from "../../components/InputLabel"; // Atualize o caminho conforme necessário
 import {
   LeftOutlined,
@@ -24,7 +24,7 @@ const RegisterUser = () => {
       .then(() => {
         setCurrentStep(currentStep + 1);
       })
-      .catch(() => {
+      .catch((err) => {
         // Se houver erros de validação, o usuário não avançará para a próxima etapa
       });
   };
@@ -36,11 +36,16 @@ const RegisterUser = () => {
   const handleSubmit = async (registerFormValues) => {
     try {
       await apiRegister(registerFormValues);
-      alert("Usuário cadastrado!");
+      notification.success({
+        message: 'Sucesso',
+        description: 'Usuário cadastrado com sucesso!',
+      });
       navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
-      alert("Falha no cadastro.");
-    }
+      notification.error({
+        message: 'Erro',
+        description: `Falha no cadastro: ${error.message}`,
+      });    }
   };
 
   return (

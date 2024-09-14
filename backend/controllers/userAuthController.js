@@ -48,8 +48,18 @@ const userLogin = async (request, response) => {
 
 // Função de cadastro de usuário:
 const userRegistration = async (request, response) => {
-    console.log('Requisição recebida no backend!');
-}
+  const { body } = request;
+	try {
+		await userAuthModel.registerUserData(body)
+		return response.status(201).json({ message: 'Usuário cadastrado com sucesso!' })
+	} catch (error) {
+		if(error.message.includes('Email já cadastrado.')) {
+			return response.status(400).json({ message: error.message })
+		}
+
+		return response.status(500).json({ message: 'Erro na criação de usuário' })
+	}
+};
 
 module.exports = {
     userLogin,
