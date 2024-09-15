@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const userAuthRoute = require('./routes/userAuthRoute');
-const userRegisterRoute = require('./routes/userAuthRoute');
 
 // Configura middleware do CORS:
 app.use(cors({
@@ -17,7 +16,6 @@ app.use(express.json());
 
 // Chama as rotas de autenticação:
 app.use('/auth', userAuthRoute);
-app.use('/auth', userRegisterRoute);
 
 // Inicializa servidor:
 const PORT = process.env.PORT || 5000;

@@ -36,14 +36,15 @@ const getUserProfileAndPermissions = async (idUser) => {
 };
 
 // Cadastra usuário no banco de dados:
-const registerUserData = async (registerFormData) => {
+const registerNewUser = async (idUser) => {
     try {
         const [rows] = await promisePool.query(
-            `SELECT * FROM usuario`,
+            `SELECT * FROM usuario
+             WHERE idUser = ?`,
             [idUser]
         );
 
-        return rows;
+        return rows[0];
     } catch (error) {
         console.log('Erro ao cadastrar usuário no bando de dados: ', error);
         throw new Error('Erro ao cadastrar usuário no bando de dados: ' + error.message);
@@ -52,5 +53,6 @@ const registerUserData = async (registerFormData) => {
 
 module.exports = {
     getUserByEmail,
-    getUserProfileAndPermissions
+    getUserProfileAndPermissions,
+    registerNewUser
 };

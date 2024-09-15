@@ -1,51 +1,39 @@
 import React, { useState } from "react";
-import { Button, Form, Input, Typography } from "antd";
+import { Button, Form, Input, Modal, Typography } from "antd";
 import { MailOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
-import backgroundImage from "../../images/login-background-dark.jpg";
 
 const { Title, Text } = Typography;
 
-const ForgotPassword = () => {
+const ForgotPasswordModal = ({ isVisible, handleCancel }) => {
   const [email, setEmail] = useState("");
 
   const onFinish = async (values) => {
     try {
       // Aqui você pode implementar a lógica de envio do link
       alert("Um link de recuperação foi enviado para o seu email!");
+      handleCancel();
     } catch (error) {
       alert("Erro ao enviar o link.");
     }
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "left",
-      }}
+    <Modal
+      title={null}
+      visible={isVisible}
+      onCancel={handleCancel}
+      footer={null}
+      centered={true} // Garante que o modal apareça no centro da telao
     >
       <div
         style={{
-          width: "100%",
-          maxWidth: "400px",
-          backgroundColor: "white",
-          padding: "40px",
-          borderRadius: "10px",
+          padding: "20px",
+          textAlign: "center",
         }}
       >
         <Title
           level={2}
-          style={{
-            textAlign: "center",
-            marginBottom: "10px",
-            fontWeight: "semi-bold",
-          }}
+          style={{ marginBottom: "10px", fontWeight: "semi-bold" }}
         >
           Esqueceu a senha
         </Title>
@@ -53,7 +41,6 @@ const ForgotPassword = () => {
         <Text
           type="secondary"
           style={{
-            textAlign: "center",
             display: "block",
             marginBottom: "20px",
             fontSize: "15px",
@@ -87,16 +74,10 @@ const ForgotPassword = () => {
               Enviar link
             </Button>
           </Form.Item>
-
-          <Form.Item>
-            <Text type="secondary">
-              Lembrou a senha? <Link to="/login">Voltar para o login</Link>
-            </Text>
-          </Form.Item>
         </Form>
       </div>
-    </div>
+    </Modal>
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordModal;

@@ -4,6 +4,7 @@ import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { apiLogin } from "../../api/userAuthentication";
 import backgroundImage from "../../images/login-background.jpg";
+import ForgotPasswordModal from "./ForgotPasswordModal"; // Importe o modal
 
 const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;
@@ -11,6 +12,7 @@ const { Title, Text } = Typography;
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false); // Controle de visibilidade do modal
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
@@ -21,6 +23,15 @@ const Login = () => {
     } catch (error) {
       alert("Falha no login.");
     }
+  };
+
+  // Funções para abrir e fechar o modal
+  const showForgotPasswordModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
@@ -113,7 +124,8 @@ const Login = () => {
               <Checkbox>Lembrar-me</Checkbox>
             </Form.Item>
 
-            <Link to="/forgot-password" style={{ float: "right" }}>
+            {/* Abrir o modal ao clicar no link "Esqueceu a senha?" */}
+            <Link onClick={showForgotPasswordModal} style={{ float: "right" }}>
               Esqueceu a senha?
             </Link>
           </Form.Item>
@@ -132,6 +144,12 @@ const Login = () => {
           </Form.Item>
         </Form>
       </div>
+
+      {/* Modal de Esqueceu a Senha */}
+      <ForgotPasswordModal
+        isVisible={isModalVisible}
+        handleCancel={handleCancel}
+      />
     </div>
   );
 };

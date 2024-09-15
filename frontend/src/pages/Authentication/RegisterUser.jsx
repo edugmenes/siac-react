@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Row, Typography } from "antd";
-import { TextLabel, DropdownLabel } from "../../components/InputLabel"; // Atualize o caminho conforme necessário
+import { TextLabel, DropdownLabel } from "../../components/InputLabel";
 import {
   LeftOutlined,
   RightOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { apiRegister } from "../../api/userAuthentication";
-import backgroundImage from "../../images/login-background-v2.jpg"; // Atualize o caminho para a imagem
+import backgroundImage from "../../images/login-background-v2.jpg";
 
 const { Item } = Form;
 const { Title } = Typography;
@@ -16,12 +16,15 @@ const { Title } = Typography;
 const RegisterUser = () => {
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({}); // Armazena os dados de ambas as etapas
   const navigate = useNavigate();
 
   const handleNext = () => {
     form
       .validateFields()
-      .then(() => {
+      .then((values) => {
+        // Armazena os valores da primeira página do forms:
+        setFormData({ ...formData, ...values });
         setCurrentStep(currentStep + 1);
       })
       .catch(() => {
@@ -33,9 +36,11 @@ const RegisterUser = () => {
     setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = async (registerFormValues) => {
+  const handleSubmit = async (values) => {
+    // Combina os dados da segunda etapa com os da primeira
+    const combinedData = { ...formData, ...values };
     try {
-      await apiRegister(registerFormValues);
+      await apiRegister(combinedData);
       alert("Usuário cadastrado!");
       navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
