@@ -36,38 +36,15 @@ const getUserProfileAndPermissions = async (idUser) => {
 };
 
 // Cadastra usuário no banco de dados:
-const registerUserData = async (registerFormData) => {
-    const { nomeUser, email, perfilLabel, perfilId, password } = registerFormData;
-
+const registerNewUser = async (idUser) => {
     try {
-        const [existingUser] = await promisePool.query(
-            `SELECT * FROM usuario WHERE email = ?`,
-            [email]
+        const [rows] = await promisePool.query(
+            `SELECT * FROM usuario
+             WHERE idUser = ?`,
+            [idUser]
         );
 
-        if (existingUser.length > 0) {
-            throw new Error('Email já cadastrado.');
-        }
-
-        const [result] = await promisePool.query(
-            `INSERT INTO usuario (nome, email, password, perfil, id_perfil) VALUES (?, ?, ?, ?, ?)`,
-            [nomeUser, email, password, perfilLabel, perfilId]
-        );
-
-        const [usuarioPerfil] = await promisePool.query(
-            `INSERT INTO usuario_perfil (id_usuario, id_perfil) VALUES (?, ?)`,
-            [result.insertId, perfilId]
-        );
-
-        if (result.affectedRows > 0) {
-            return {
-                success: true,
-                message: 'Usuário cadastrado com sucesso!',
-                userId: result.insertId
-            };
-        } else {
-            throw new Error('Falha ao cadastrar o usuário.');
-        }
+        return rows[0];
     } catch (error) {
         throw new Error(error.message);
     }
@@ -76,5 +53,5 @@ const registerUserData = async (registerFormData) => {
 module.exports = {
     getUserByEmail,
     getUserProfileAndPermissions,
-    registerUserData
+    registerNewUser
 };

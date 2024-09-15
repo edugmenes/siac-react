@@ -9,9 +9,10 @@ const pool = mysql.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
+    queueLimit: 0,
     connectionLimit: 10,
     connectTimeout: 10000,
-    queueLimit: 0
+    reconnect: true
 });
 
 // Promessa do pool de conexão para uso com async/await

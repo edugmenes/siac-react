@@ -25,10 +25,10 @@ const userLogin = async (request, response) => {
         // Buscar perfil e permissões:
         const userPermissions = await userAuthModel.getUserProfileAndPermissions(user.idUser);
         if (!userPermissions || userPermissions.length === 0) {
-            return response.status(404).json({ message: 'Perfil ou permissões não encontrados.' });
+            return response.status(404).json({ message: 'Perfil ou permissões não encontrados: ' });
         }
 
-        const permissions = userPermissions.map(permission => permission.permissao);
+        const permissions = userPermissions.map(permissions => permissions.permission);
         const profile = userPermissions[0].perfil;
 
         // Gerar o token JWT:
@@ -42,24 +42,30 @@ const userLogin = async (request, response) => {
         return response.status(200).json({ token });
     } catch (error) {
         console.error('Erro no processo de autenticação: ', error);
-        return response.status(500).json({ message: 'Erro no processo de autenticação.' });
+        return response.status(500).json({ message: 'Erro no processo de autenticação: ' });
     }
 };
 
 // Função de cadastro de usuário:
 const userRegistration = async (request, response) => {
-  const { body } = request;
-	try {
-		await userAuthModel.registerUserData(body)
-		return response.status(201).json({ message: 'Usuário cadastrado com sucesso!' })
-	} catch (error) {
-		if(error.message.includes('Email já cadastrado.')) {
-			return response.status(400).json({ message: error.message })
-		}
+    console.log('Requisição recebida no backend!');
+    console.log(request.body);
+    const data = request.body;
 
-		return response.status(500).json({ message: 'Erro na criação de usuário' })
-	}
-};
+    try {
+        // Verifique se o usuário já está cadastrado:
+        const user = await userAuthModel.getUserByEmail(data.email);
+        if (user) {
+            return response.status(401).json({ message: 'Email já cadastrado!' });
+        }
+        else {
+            return true;
+        }
+    } catch (error) {
+        console.error('Erro no processo de autenticação: ', error);
+        return response.status(500).json({ message: 'Erro no processo de autenticação.' });
+    }
+}
 
 module.exports = {
     userLogin,

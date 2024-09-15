@@ -11,7 +11,7 @@ const apiLogin = async (email, password) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Erro no processo de autenticação. Status: ${response.status}`);
+            throw new Error(`${response.message}${response.status}`);
         }
 
         const data = await response.json();
