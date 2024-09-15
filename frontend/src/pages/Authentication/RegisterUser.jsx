@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Form, Row, Typography } from "antd";
+import { Button, Col, Form, Row, Typography, notification } from "antd";
 import { TextLabel, DropdownLabel } from "../../components/InputLabel";
 import {
   LeftOutlined,
@@ -41,10 +41,16 @@ const RegisterUser = () => {
     const combinedData = { ...formData, ...values };
     try {
       await apiRegister(combinedData);
-      alert("Usuário cadastrado!");
+      notification.success({
+        message: "Sucesso",
+        description: "Usuário cadastrado com sucesso!",
+      });
       navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
-      alert("Falha no cadastro.");
+      notification.error({
+        message: "Erro",
+        description: `Falha no cadastro: ${error.message}`,
+      });
     }
   };
 

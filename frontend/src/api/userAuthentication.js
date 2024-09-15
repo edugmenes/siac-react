@@ -36,7 +36,10 @@ const apiRegister = async (registerFormValues) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Erro ao cadastrar usuário. Status: ${response.status}`);
+            const errorData = await response.json();
+            const errorMessage = errorData.message ||
+                `Erro ao cadastrar usuário. Status: ${response.status}`;
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
