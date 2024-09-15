@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -12,10 +12,13 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
+import { getUsersByRole } from "../../api/userAuthentication";
 
 const AppointmentSchedule = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const mockedDoctors = [
     {
@@ -35,6 +38,32 @@ const AppointmentSchedule = () => {
       label: "Edu",
     },
   ];
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await getUsersByRole("5");
+        setDoctors(response);
+      } catch (error) {
+        console.error("Erro ao buscar médicos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await getUsersByRole("5");
+      setDoctors(response);
+    } catch (error) {
+      console.error("Erro ao buscar médicos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDateChange = (value, dateString) => {
     setSelectedDate(value);
@@ -159,6 +188,14 @@ const AppointmentSchedule = () => {
                 </Button>
               </Col>
             </Row>
+            <Button
+              size="large"
+              onClick={fetchDoctors}
+              type="primary"
+              style={{ marginTop: "30px" }}
+            >
+              Agendar consulta
+            </Button>
           </div>
         </ConfigProvider>
       </Form>

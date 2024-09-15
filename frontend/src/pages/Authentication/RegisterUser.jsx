@@ -10,7 +10,6 @@ import {
 import { apiRegister } from "../../api/userAuthentication";
 import backgroundImage from "../../images/login-background-v2.jpg"; // Atualize o caminho para a imagem
 
-const { Item } = Form;
 const { Title } = Typography;
 
 const RegisterUser = () => {
