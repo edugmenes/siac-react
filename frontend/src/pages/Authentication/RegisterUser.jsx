@@ -36,21 +36,27 @@ const RegisterUser = () => {
     setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (registerFormValues) => {
     // Combina os dados da segunda etapa com os da primeira
-    const combinedData = { ...formData, ...values };
     try {
-      await apiRegister(combinedData);
+      const perfilSelecionado = registerFormValues.perfil;
+      const [key, label] = perfilSelecionado.split("|");
+      const formattedData = {
+        ...registerFormValues,
+        perfilId: key,
+        perfilLabel: label,
+      };
+      await apiRegister(formattedData);
       notification.success({
-        message: "Sucesso",
-        description: "Usuário cadastrado com sucesso!",
+        message: 'Sucesso',
+        description: 'Usuário cadastrado com sucesso!',
       });
       navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
       notification.error({
-        message: "Erro",
+        message: 'Erro',
         description: `Falha no cadastro: ${error.message}`,
-      });
+      });    
     }
   };
 
@@ -212,11 +218,11 @@ const RegisterUser = () => {
                       },
                     ]}
                     options={[
-                      { value: "paciente", label: "Paciente" },
-                      { value: "professor", label: "Professor" },
-                      { value: "recepcionista", label: "Recepcionista" },
-                      { value: "administrador", label: "Administrador" },
-                      { value: "psicologo", label: "Psicólogo" },
+                      { value: "2|paciente", label: "Paciente" },
+                      { value: "4|professor", label: "Professor" },
+                      { value: "3|recepcionista", label: "Recepcionista" },
+                      { value: "1|administrador", label: "Administrador" },
+                      { value: "5|psicologo", label: "Psicólogo" },
                     ]}
                   />
                 </Col>
