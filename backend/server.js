@@ -16,6 +16,7 @@ app.use(express.json());
 
 // Chama as rotas de autenticação:
 app.use('/auth', userAuthRoute);
+app.use('', userAuthRoute)
 
 // Inicializa servidor:
 const PORT = process.env.PORT || 5000;

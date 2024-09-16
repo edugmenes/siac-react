@@ -43,8 +43,32 @@ const apiRegister = async (registerFormValues) => {
     }
 };
 
+const getUsersByRole = async (id) => {
+    try {
+        const url = `${backendUrl}/users/roleId/${id}`;
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar usuários: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Erro:", error);
+        return null;
+    }
+};
+
 
 module.exports = {
     apiLogin,
-    apiRegister
+    apiRegister,
+    getUsersByRole
 };
