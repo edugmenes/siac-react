@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -13,29 +13,32 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
+import { getUsersByRole } from "../../api/userAuthentication";
 
 const AppointmentSchedule = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const mockedDoctors = [
-    {
-      value: "1",
-      label: "Henrique",
-    },
-    {
-      value: "2",
-      label: "Felipão",
-    },
-    {
-      value: "3",
-      label: "Raul",
-    },
-    {
-      value: "4",
-      label: "Edu",
-    },
-  ];
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await getUsersByRole(5);
+        const doctorsToDropdown = response.data.map((d) => ({
+          label: d.nome,
+          value: d.idUser,
+        }));
+        setDoctors(doctorsToDropdown);
+      } catch (error) {
+        console.error("Erro ao buscar médicos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   const handleDateChange = (value, dateString) => {
     setSelectedDate(value);
@@ -148,7 +151,7 @@ const AppointmentSchedule = () => {
                     onChange={handleProfessionalChange}
                     size="large"
                     placeholder="Selecione o profissional"
-                    options={mockedDoctors}
+                    options={doctors}
                     disabled={!selectedTime}
                   />
                 </Form.Item>

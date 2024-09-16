@@ -62,7 +62,24 @@ const userRegistration = async (request, response) => {
     }
 };
 
+const getUsersByRole = async (req, res) => {
+    const { id } = req.params; // Extrai o 'id' da URL
+
+    try {
+        const users = await userAuthModel.getUsersByRole(id);
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: `Nenhum usuário encontrado com o id_perfil: ${id}` });
+        }
+
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Não foi possível buscar usuários com esse perfil", details: error.message });
+    }
+};
+
 module.exports = {
     userLogin,
-    userRegistration
+    userRegistration,
+    getUsersByRole
 };
