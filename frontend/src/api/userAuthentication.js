@@ -45,7 +45,7 @@ const apiRegister = async (registerFormValues) => {
 
 const getUsersByRole = async (id) => {
     try {
-        const url = `${backendUrl}/users/roleId/${id}`;
+        const url = `${backendUrl}/user/roleId/${id}`;
 
         const response = await fetch(url, {
             method: "GET",

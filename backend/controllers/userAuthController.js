@@ -5,7 +5,6 @@ const userAuthModel = require('../models/userAuthModel');
 // Função de login:
 const userLogin = async (request, response) => {
     const { email, password } = request.body;
-    console.log('Requisição recebida no backend!');
 
     try {
         // Verifique se o usuário existe e email:
@@ -46,7 +45,7 @@ const userLogin = async (request, response) => {
     }
 };
 
-// Função de cadastro de usuário:
+// Funções para cadastro de usuário:
 const userRegistration = async (request, response) => {
 
     const { body } = request;
@@ -62,24 +61,37 @@ const userRegistration = async (request, response) => {
     }
 };
 
-const getUsersByRole = async (req, res) => {
-    const { id } = req.params; // Extrai o 'id' da URL
+const userAdressRegistration = async (request, response) => {
+    const { cep } = request.body;
+    console.log(cep);
+    try {
+        await userAuthModel.registerUserAdress(cep)
+        return response.status(200).json(cep)
+    } catch (error) {
+        response.status(500).json({ message: "Não foi possível cadastrar o endereço.", details: error.message });
+    }
+}
+
+// Função para pegar usuário por id:
+const getUsersByRole = async (request, response) => {
+    const { id } = request.params; // Extrai o 'id' da URL
 
     try {
         const users = await userAuthModel.getUsersByRole(id);
 
         if (!users || users.length === 0) {
-            return res.status(404).json({ message: `Nenhum usuário encontrado com o id_perfil: ${id}` });
+            return response.status(404).json({ message: `Nenhum usuário encontrado com o id_perfil: ${id}` });
         }
 
-        res.status(200).json(users);
+        response.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: "Não foi possível buscar usuários com esse perfil", details: error.message });
+        response.status(500).json({ message: "Não foi possível buscar usuários com esse perfil", details: error.message });
     }
 };
 
 module.exports = {
     userLogin,
     userRegistration,
+    userAdressRegistration,
     getUsersByRole
 };
