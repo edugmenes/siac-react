@@ -9,7 +9,7 @@ import Settings from "./pages/Settings.jsx";
 import Painel from "./pages/Painel.jsx";
 import Documents from "./pages/Documents.jsx";
 import Bin from "./pages/Help.jsx";
-import Appointments from "./pages/Appointments/index.jsx";
+import Appointments from "./pages/Appointments/Appointment.jsx";
 import AppointmentSchedule from "./pages/Appointments/AppointmentSchedule.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:

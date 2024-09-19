@@ -114,7 +114,9 @@ const PageLayout = () => {
             marginLeft: "40px",
           }}
         >
-          SIAC
+          <Link to="/" style={{ color: "#fff", textDecoration: "none" }}>
+            SIAC
+          </Link>
         </h1>
 
         <Dropdown overlay={userMenu} trigger={["click"]}>
