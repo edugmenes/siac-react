@@ -68,12 +68,6 @@ const UsersList = () => {
     },
   ];
 
-  const mockedData = [
-    {
-      name: "Henrique",
-    },
-  ];
-
   return (
     <>
       <Row
