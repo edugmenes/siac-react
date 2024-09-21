@@ -50,6 +50,12 @@ const menuItems = [
     icon: <DeleteOutlined style={{ fontSize: "24px" }} />,
   },
   {
+    key: "7",
+    label: "Usuários",
+    link: "/users",
+    icon: <UserOutlined style={{ fontSize: "24px" }} />,
+  },
+  {
     key: "6",
     label: "Configurações",
     link: "/settings",

@@ -74,6 +74,23 @@ const registerUserData = async (registerFormData) => {
     }
 }
 
+const getUsers = async () => {
+    try {
+      const [users] = await promisePool.query(
+        `SELECT * FROM usuario`
+      );
+        
+      if (users.length === 0) {
+        return { success: false, message: `Nenhum usuário encontrado` };
+      }
+
+      return { success: true, data: users };
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+      return { success: false, message: "Erro ao buscar usuários", details: error.message };
+    }
+};
+
 const getUsersByRole = async (id) => {
     try {
       const [users] = await promisePool.query(
@@ -95,5 +112,6 @@ module.exports = {
     getUserByEmail,
     getUserProfileAndPermissions,
     registerUserData,
-    getUsersByRole
+    getUsersByRole,
+    getUsers
 };

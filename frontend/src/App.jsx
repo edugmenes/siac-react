@@ -11,6 +11,7 @@ import Documents from "./pages/Documents.jsx";
 import Bin from "./pages/Help.jsx";
 import Appointments from "./pages/Appointments/Appointment.jsx";
 import AppointmentSchedule from "./pages/Appointments/AppointmentSchedule.jsx";
+import UsersList from "./pages/Users/usersList.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
 const ProtectedRoute = ({ element: Element, ...rest }) => {
@@ -42,6 +43,10 @@ const App = () => (
           element={<ProtectedRoute element={AppointmentSchedule} />}
         />
         <Route path="bin" element={<ProtectedRoute element={Bin} />} />
+        <Route
+          path="users"
+          element={<ProtectedRoute element={UsersList} />}
+        />
         <Route
           path="settings"
           element={<ProtectedRoute element={Settings} />}
