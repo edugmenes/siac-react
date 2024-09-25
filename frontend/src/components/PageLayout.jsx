@@ -28,7 +28,7 @@ const menuItems = [
   {
     key: "2",
     label: "Painel",
-    link: "/painel",
+    link: "/painel/dashboards",
     icon: <AppstoreOutlined style={{ fontSize: "24px" }} />,
   },
   {

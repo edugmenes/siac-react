@@ -20,7 +20,7 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const Painel = () => {
+const CreateAgenda = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
   const [selectedEndTime, setSelectedEndTime] = useState(null);
@@ -301,4 +301,4 @@ const Painel = () => {
   );
 };
 
-export default Painel;
+export default CreateAgenda;

@@ -14,12 +14,12 @@ const Home = () => {
       <CardComponent
         title="Criar Agendas"
         pathImage={calendarImage}
-        redirectPath="/painel"
+        redirectPath="/agenda/create-agenda"
       />
       <CardComponent
         title="Prontuários"
         pathImage={scheduleImage}
-        redirectPath="/painel"
+        redirectPath="/medical/patient-records"
       />
     </div>
   );

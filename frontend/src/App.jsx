@@ -6,7 +6,7 @@ import RegisterUser from "./pages/Authentication/RegisterUser.jsx";
 import Home from "./pages/Home/Home.jsx";
 import PageLayout from "./components/PageLayout.jsx";
 import Settings from "./pages/Settings.jsx";
-import Painel from "./pages/Painel.jsx";
+import CreateAgenda from "./pages/Agenda/CreateAgenda.jsx";
 import Documents from "./pages/Documents.jsx";
 import Bin from "./pages/Help.jsx";
 import Appointments from "./pages/Appointments/Appointment.jsx";
@@ -29,7 +29,10 @@ const App = () => (
       {/* Rotas protegidas (apenas para usuários cadastrados e autenticados/logados): */}
       <Route path="/" element={<ProtectedRoute element={PageLayout} />}>
         <Route index element={<ProtectedRoute element={Home} />} />
-        <Route path="painel" element={<ProtectedRoute element={Painel} />} />
+        <Route
+          path="/agenda/create-agenda"
+          element={<ProtectedRoute element={CreateAgenda} />}
+        />
         <Route
           path="documents"
           element={<ProtectedRoute element={Documents} />}
@@ -43,10 +46,7 @@ const App = () => (
           element={<ProtectedRoute element={AppointmentSchedule} />}
         />
         <Route path="bin" element={<ProtectedRoute element={Bin} />} />
-        <Route
-          path="users"
-          element={<ProtectedRoute element={UsersList} />}
-        />
+        <Route path="users" element={<ProtectedRoute element={UsersList} />} />
         <Route
           path="settings"
           element={<ProtectedRoute element={Settings} />}

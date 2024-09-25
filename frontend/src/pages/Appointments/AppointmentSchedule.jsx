@@ -9,12 +9,13 @@ import {
   Row,
   Select,
   Typography,
+  notification,
 } from "antd";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { getUsersByRole } from "../../api/userAuthentication";
-
+import { apiAppointmentSchedule } from "../../api/appointmentSchedule";
 const AppointmentSchedule = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -31,7 +32,7 @@ const AppointmentSchedule = () => {
         }));
         setDoctors(doctorsToDropdown);
       } catch (error) {
-        console.error("Erro ao buscar médicos:", error);
+        console.error("Erro ao buscar psicólogos:", error);
       } finally {
         setLoading(false);
       }
@@ -53,14 +54,25 @@ const AppointmentSchedule = () => {
     console.log(value);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const formattedValues = {
       ...values,
       date: values.date ? dayjs(values.date).format("DD/MM/YYYY") : null,
       time: values.time ? dayjs(values.time).format("HH:mm") : null,
     };
 
-    console.log("Formatted values:", formattedValues);
+    try {
+      await appointmentSchedule(formattedValues);
+      notification.success({
+        message: "Sucesso",
+        description: "Consultas agendada com sucesso!",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha no agendamento: ${error.message}`,
+      });
+    }
   };
 
   const disabledHours = () => {
@@ -98,7 +110,7 @@ const AppointmentSchedule = () => {
             <Row>
               <Col span={6}>
                 <Form.Item
-                  label="Selecione a data"
+                  label="Selecione a data:"
                   name="date"
                   rules={[{ required: true, message: "Selecione uma data" }]}
                 >
@@ -116,7 +128,7 @@ const AppointmentSchedule = () => {
             <Row>
               <Col span={6}>
                 <Form.Item
-                  label="Selecione o horário"
+                  label="Selecione o horário:"
                   name="time"
                   rules={[{ required: true, message: "Selecione um horário" }]}
                 >
@@ -140,7 +152,7 @@ const AppointmentSchedule = () => {
             <Row>
               <Col span={6}>
                 <Form.Item
-                  label="Selecione o profissional"
+                  label="Selecione o profissional:"
                   name="professional"
                   rules={[
                     { required: true, message: "Selecione um profissional" },
