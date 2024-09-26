@@ -4,7 +4,7 @@ import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
 import { apiLogin } from "../../api/userAuthentication";
 import backgroundImage from "../../images/login-background.jpg";
-import ForgotPasswordModal from "./ForgotPasswordModal"; // Importe o modal
+import ForgotPasswordModal from "./ForgotPassword"; // Importe o modal
 
 const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;

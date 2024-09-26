@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Authentication/Login.jsx";
-import ForgotPasswordModal from "./pages/Authentication/ForgotPasswordModal.jsx";
 import RegisterUser from "./pages/Authentication/RegisterUser.jsx";
 import Home from "./pages/Home/Home.jsx";
 import PageLayout from "./components/PageLayout.jsx";
@@ -9,8 +8,8 @@ import Settings from "./pages/Settings.jsx";
 import CreateAgenda from "./pages/Agenda/CreateAgenda.jsx";
 import Documents from "./pages/Documents.jsx";
 import Bin from "./pages/Help.jsx";
-import Appointments from "./pages/Appointments/Appointment.jsx";
-import AppointmentSchedule from "./pages/Appointments/AppointmentSchedule.jsx";
+import Appointment from "./pages/Appointment/Appointment.jsx";
+import AppointmentScheduling from "./pages/Appointment/AppointmentScheduling.jsx";
 import UsersList from "./pages/Users/usersList.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
@@ -38,12 +37,12 @@ const App = () => (
           element={<ProtectedRoute element={Documents} />}
         />
         <Route
-          path="appointments"
-          element={<ProtectedRoute element={Appointments} />}
+          path="appointment"
+          element={<ProtectedRoute element={Appointment} />}
         />
         <Route
-          path="appointments/schedule"
-          element={<ProtectedRoute element={AppointmentSchedule} />}
+          path="appointment/scheduling"
+          element={<ProtectedRoute element={AppointmentScheduling} />}
         />
         <Route path="bin" element={<ProtectedRoute element={Bin} />} />
         <Route path="users" element={<ProtectedRoute element={UsersList} />} />

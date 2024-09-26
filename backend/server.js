@@ -16,9 +16,9 @@ app.use(cors({
 app.use(express.json());
 
 // Chama as rotas de autenticação:
+app.use('/', userRoutes);
 app.use('/auth', userRoutes);
 app.use('/user', userRoutes);
-app.use('/', userRoutes);
 app.use('/appointment', appointmentRoutes);
 
 // Inicializa servidor:

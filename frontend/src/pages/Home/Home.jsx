@@ -9,7 +9,7 @@ const Home = () => {
       <CardComponent
         title="Agendar Consultas"
         pathImage={calendarImage}
-        redirectPath="/appointments/schedule"
+        redirectPath="/appointment/scheduling"
       />
       <CardComponent
         title="Criar Agendas"

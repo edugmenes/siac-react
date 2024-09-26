@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+// TODO: usar bcrypt para gravar senhas criptografadas no banco (hash + salt)
 const bcrypt = require('bcrypt');
-const userAuthModel = require('../models/userModel');
+const userModel = require('../models/userModel');
 
 // Função de login:
 const userLogin = async (request, response) => {
@@ -8,7 +9,7 @@ const userLogin = async (request, response) => {
 
     try {
         // Verifique se o usuário existe e email:
-        const user = await userAuthModel.getUserByEmail(email);
+        const user = await userModel.getUserByEmail(email);
         if (!user) {
             return response.status(401).json({ message: 'Email não cadastrado!' });
         }
@@ -22,7 +23,7 @@ const userLogin = async (request, response) => {
         }
 
         // Buscar perfil e permissões:
-        const userPermissions = await userAuthModel.getUserProfileAndPermissions(user.idUser);
+        const userPermissions = await userModel.getUserProfileAndPermissions(user.idUser);
         if (!userPermissions || userPermissions.length === 0) {
             return response.status(404).json({ message: 'Perfil ou permissões não encontrados: ' });
         }
@@ -50,7 +51,7 @@ const userRegistration = async (request, response) => {
 
     const { body } = request;
     try {
-        await userAuthModel.registerUserData(body)
+        await userModel.registerUserData(body)
         return response.status(201).json({ message: 'Usuário cadastrado com sucesso!' })
     } catch (error) {
         if (error.message.includes('Email já cadastrado.')) {
@@ -65,7 +66,7 @@ const userAdressRegistration = async (request, response) => {
     const { cep } = request.body;
     console.log(cep);
     try {
-        await userAuthModel.registerUserAdress(cep)
+        await userModel.registerUserAdress(cep)
         return response.status(200).json(cep)
     } catch (error) {
         response.status(500).json({ message: "Não foi possível cadastrar o endereço.", details: error.message });
@@ -74,7 +75,7 @@ const userAdressRegistration = async (request, response) => {
 
 const getUsers = async (request, response) => {
     try {
-        const users = await userAuthModel.getUsers();
+        const users = await userModel.getUsers();
         response.status(200).json(users);
     } catch (error) {
         console.error("Error fetching users:", error); // Log the error for debugging
@@ -87,7 +88,7 @@ const getUsersByRole = async (request, response) => {
     const { id } = request.params; // Extrai o 'id' da URL
 
     try {
-        const users = await userAuthModel.getUsersByRole(id);
+        const users = await userModel.getUsersByRole(id);
 
         if (!users || users.length === 0) {
             return response.status(404).json({ message: `Nenhum usuário encontrado com o id_perfil: ${id}` });

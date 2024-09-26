@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 
-const Appointments = () => {
+const Appointment = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -102,4 +102,4 @@ const Appointments = () => {
   );
 };
 
-export default Appointments;
+export default Appointment;

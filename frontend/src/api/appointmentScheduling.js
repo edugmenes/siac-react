@@ -1,15 +1,15 @@
 const backendUrl = "http://localhost:5000";
 
-const apiAppointmentSchedule = async (scheduleFormValues) => {
+const apiAppointmentScheduling = async (schedulingFormValues) => {
     console.log('Valores passados na requisição front -> back:');
-    console.log(scheduleFormValues);
+    console.log(schedulingFormValues);
     try {
-        const reponse = await fetch(`${backendUrl}/appointment/schedule`, {
+        const reponse = await fetch(`${backendUrl}/appointment/scheduling`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ scheduleFormValues }),
+            body: JSON.stringify({ schedulingFormValues }),
         });
     } catch (error) {
         console.log('Erro');
@@ -17,5 +17,5 @@ const apiAppointmentSchedule = async (scheduleFormValues) => {
 }
 
 module.exports = {
-    apiAppointmentSchedule
+    apiAppointmentScheduling
 };

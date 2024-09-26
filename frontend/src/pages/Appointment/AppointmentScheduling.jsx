@@ -15,8 +15,9 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { getUsersByRole } from "../../api/userAuthentication";
-import { apiAppointmentSchedule } from "../../api/appointmentSchedule";
-const AppointmentSchedule = () => {
+import { apiAppointmentScheduling } from "../../api/appointmentScheduling";
+
+const AppointmentScheduling = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [doctors, setDoctors] = useState([]);
@@ -62,7 +63,7 @@ const AppointmentSchedule = () => {
     };
 
     try {
-      await appointmentSchedule(formattedValues);
+      await apiAppointmentScheduling(formattedValues);
       notification.success({
         message: "Sucesso",
         description: "Consultas agendada com sucesso!",
@@ -189,4 +190,4 @@ const AppointmentSchedule = () => {
   );
 };
 
-export default AppointmentSchedule;
+export default AppointmentScheduling;
