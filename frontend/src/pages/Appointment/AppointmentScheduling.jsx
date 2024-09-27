@@ -62,8 +62,14 @@ const AppointmentScheduling = () => {
       time: values.time ? dayjs(values.time).format("HH:mm") : null,
     };
 
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) {
+      console.error("Token não encontrado no localStorage");
+      return;
+    }
+
     try {
-      await apiAppointmentScheduling(formattedValues);
+      await apiAppointmentScheduling(formattedValues, authToken);
       notification.success({
         message: "Sucesso",
         description: "Consultas agendada com sucesso!",

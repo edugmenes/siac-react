@@ -1,8 +1,7 @@
-const backendUrl = 'http://localhost:5000';
+const backendUrl = "http://localhost:5000";
 
-const apiAppointmentScheduling = async (formValues) => {
-    const authToken = sessionStorage.getItem('authToken');
-
+debugger;
+const apiAppointmentScheduling = async (formValues, authToken) => {
     try {
         const response = await fetch(`${backendUrl}/appointment/scheduling`, {
             method: 'POST',

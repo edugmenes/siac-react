@@ -1,51 +1,51 @@
 const promisePool = require('../config/databaseConfig');
 
 const registerAgenda = async (formValues) => {
-    const { date, professional, time, idUser } = formValues;
+    const { date, professional, initialTime, endTime } = formValues;
+
+    console.log("Dados da model registerHorario:");
+    console.log(date);
+    console.log(professional);
+    console.log(initialTime);
+    console.log(endTime);
 
     try {
-        const [existingRegister] = await promisePool.query(
-            `SELECT * FROM agenda 
-             WHERE data = ?
-                AND horaIni = ?
-                AND idUser = ?`,
-            [date, time, professional]
-        );
-
-        if (existingRegister.length > 0) {
-            throw new Error('Essa data e horários não estão disponíveis para esse profissional.');
-        }
-
         const [result] = await promisePool.query(
             `INSERT INTO agenda (horaIni, horaFin, data, diaSemana, idUser) VALUES (?, ?, ?, ?, ?)`,
-            [time, null, date, null, professional]
+            [initialTime, endTime, date, 'dia-da-semana', professional]
         );
 
-        if (result.affectedRows > 0) {
-            return {
-                success: true,
-                message: 'Sucesso ao cadastrar agenda.',
-                data: result
-            };
-        } else {
-            throw new Error('Falha ao cadastrar agenda.');
-        }
+        // Captura o idAgenda do resultado da inserção
+        const idAgenda = result.insertId;
+
+        return {
+            success: true,
+            message: 'Cadastro de agenda realizado com sucesso!',
+            data: { idAgenda }, // Retorna o idAgenda gerado
+            formValues: formValues
+        };
     } catch (error) {
-        console.error("Erro ao cadastrar agenda:", error);
-        return { success: false, message: "Erro ao cadastrar agenda", details: error.message };
+        console.error("Erro ao simular cadastro de agenda:", error);
+        return { success: false, message: "Erro ao simular cadastro de agenda", details: error.message };
     }
 };
 
-const registerHours = async (formValues, idAgenda) => {
-    const { professional, time } = formValues;
+const registerHours = async (formValues, idUser, idAgenda) => {
+    const { professional, initialTime } = formValues;
+    const patient = idUser;
+    const agenda = idAgenda;
 
     try {
         const [result] = await promisePool.query(
-            `INSERT INTO horario (hora, idUser, disponibilidade, idAgenda, idPsico, status) VALUES (?, ?, ?, ?, ?)`,
-            []
+            `INSERT INTO horario (hora, idUser, disponibilidade, idAgenda, idPsico, status) VALUES (?, ?, ?, ?, ?, ?)`,
+            [initialTime, patient, 1, agenda, professional, 'agendado']
         );
 
-        return { sucess: true, message: 'Dados de horario cadastrados no banco!' };
+        return {
+            success: true,
+            message: 'Dados de horário cadastrados no banco!',
+            result
+        };
     } catch (error) {
         console.error("Erro ao cadastrar horários:", error);
         return { success: false, message: "Erro ao cadastrar horários:", details: error.message };

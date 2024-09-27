@@ -11,7 +11,7 @@ const apiLogin = async (email, password) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
+      throw new Error(`Erro na requisição: ${response.statusText}`);
     }
 
     const data = await response.json();
