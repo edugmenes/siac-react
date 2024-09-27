@@ -1,30 +1,32 @@
-// date: "25/09/2024"
-// professional: 123
-// time: "10:00"
+const appointmentModel = require('../models/appointmentModel');
 
-const appointmentAgenda = async (request, response) => {
-    const { scheduleFormValues } = request;
-
-    try {
-        await registerAgenda(scheduleFormValues)
-        return response.status(201).json({ message: 'Sucesso!' })
-    } catch (error) {
-        return response.status(500).json({ message: 'Erro.' })
-    }
-}
-
-const appointmentHours = async (request, response) => {
-    const { scheduleFormValues } = request;
+const appointmentScheduling = async (request, response) => {
+    const { date, professional, time } = request.body;
+    const idUser = request.user.idUser;
 
     try {
-        await registerHours(scheduleFormValues)
-        return response.status(201).json({ message: 'Sucesso!' })
+        // Registrar a agenda e capturar o idAgenda
+        const agendaResult = await appointmentModel.registerAgenda({ date, professional, time, idUser });
+
+        if (!agendaResult.success) {
+            return response.status(400).json({ message: agendaResult.message });
+        }
+
+        const { idAgenda } = agendaResult.data; // Captura o id da agenda criada
+
+        // Registrar o horário com o idAgenda
+        const horarioResult = await appointmentModel.registerHours(scheduleFormValues, idAgenda, authToken);
+
+        if (horarioResult.success) {
+            return response.status(201).json({ message: 'Consulta agendada com sucesso!', data: horarioResult.data });
+        } else {
+            return response.status(400).json({ message: horarioResult.message });
+        }
     } catch (error) {
-        return response.status(500).json({ message: 'Erro.' })
+        return response.status(500).json({ message: error.message });
     }
-}
+};
 
 module.exports = {
-    appointmentAgenda,
-    appointmentHours
+    appointmentScheduling
 };

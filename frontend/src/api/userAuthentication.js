@@ -11,13 +11,12 @@ const apiLogin = async (email, password) => {
     });
 
     if (!response.ok) {
-      throw new Error(`${response.message}${response.status}`);
+      throw new Error(`Erro na requisição: ${response.status}`);
     }
 
     const data = await response.json();
     // Armazena JWT no localStorage:
     localStorage.setItem("authToken", data.token);
-
     return data;
   } catch (error) {
     console.error("Falha no login: ", error);
@@ -35,6 +34,9 @@ const apiRegister = async (registerFormValues) => {
       body: JSON.stringify(registerFormValues),
     });
 
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
@@ -47,8 +49,6 @@ const getUsers = async () => {
   try {
     const url = `${backendUrl}/users`;
 
-    console.log('b')
-
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -57,13 +57,13 @@ const getUsers = async () => {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar usuários: ${response.statusText}`);
+      throw new Error(`Erro na requisição: ${response.statusText}`);
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Erro:", error);
+    console.error("Erro ao buscar usuários: ", error);
     return null;
   }
 };
@@ -80,13 +80,13 @@ const getUsersByRole = async (id) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro ao buscar usuários: ${response.statusText}`);
+      throw new Error(`Erro na requisição: ${response.statusText}`);
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Erro:", error);
+    console.error("Erro ao buscar usuários: ", error);
     return null;
   }
 };

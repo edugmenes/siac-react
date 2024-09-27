@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
-const { appointmentAgenda, appointmentHours } = require('../controllers/appointmentController');
+const { authenticateToken } = require('../middleware/authenticateToken')
+const { appointmentScheduling } = require('../controllers/appointmentController');
 
 // Rotas para agendamento de consulta:
-router.post('/scheduling', appointmentAgenda);
-router.post('/scheduling', appointmentHours);
+router.post('/scheduling', appointmentScheduling);
 
 module.exports = router;

@@ -1,18 +1,26 @@
-const backendUrl = "http://localhost:5000";
+const backendUrl = 'http://localhost:5000';
 
-const apiAppointmentScheduling = async (schedulingFormValues) => {
-    console.log('Valores passados na requisição front -> back:');
-    console.log(schedulingFormValues);
+const apiAppointmentScheduling = async (formValues) => {
+    const authToken = sessionStorage.getItem('authToken');
+
     try {
-        const reponse = await fetch(`${backendUrl}/appointment/scheduling`, {
-            method: "POST",
+        const response = await fetch(`${backendUrl}/appointment/scheduling`, {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ schedulingFormValues }),
+            body: JSON.stringify(formValues),
         });
+
+        if (!response.ok) {
+            throw new Error(`Erro na requisição: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
     } catch (error) {
-        console.log('Erro');
+        console.error('Erro ao agendar consulta:', error);
     }
 }
 
