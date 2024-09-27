@@ -1,18 +1,12 @@
 const promisePool = require('../config/databaseConfig');
 
 const registerAgenda = async (formValues) => {
-    const { date, professional, initialTime, endTime } = formValues;
-
-    console.log("Dados da model registerHorario:");
-    console.log(date);
-    console.log(professional);
-    console.log(initialTime);
-    console.log(endTime);
+    const { date, dayOfWeek, professional, initialTime, endTime } = formValues;
 
     try {
         const [result] = await promisePool.query(
             `INSERT INTO agenda (horaIni, horaFin, data, diaSemana, idUser) VALUES (?, ?, ?, ?, ?)`,
-            [initialTime, endTime, date, 'dia-da-semana', professional]
+            [initialTime, endTime, date, dayOfWeek, professional]
         );
 
         // Captura o idAgenda do resultado da inserção
