@@ -91,6 +91,23 @@ const getUsers = async () => {
     }
 };
 
+const getUserById = async (userId) => {
+    try {
+        const [user] = await promisePool.query(
+            `SELECT * FROM usuario WHERE idUser = ?`, [userId]
+        );
+
+        if (user.length === 0) {
+            return { success: false, message: `Nenhum usuário encontrado com esse id` };
+        }
+
+        return { success: true, data: user };
+    } catch (error) {
+        console.error("Erro ao buscar usuário:", error);
+        return { success: false, message: "Erro ao buscar usuário", details: error.message };
+    }
+};
+
 const getUsersByRole = async (id) => {
     try {
         const [users] = await promisePool.query(
@@ -113,5 +130,6 @@ module.exports = {
     getUserProfileAndPermissions,
     registerUserData,
     getUsersByRole,
+    getUserById,
     getUsers
 };

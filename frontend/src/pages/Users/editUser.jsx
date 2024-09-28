@@ -11,11 +11,9 @@ import {
 } from "antd";
 import { useParams } from "react-router-dom";
 
-const { Option } = Select;
-
 const EditUserPage = () => {
   const [form] = Form.useForm();
-  const { userId } = useParams(); // Captura o ID da URL
+  const { userId } = useParams();
 
   console.log(userId);
 

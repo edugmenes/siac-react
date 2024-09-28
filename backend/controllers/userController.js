@@ -83,6 +83,18 @@ const getUsers = async (request, response) => {
     }
 };
 
+const getUserById = async (request, response) => {
+    const { userId } = request.params
+
+    try {
+        const users = await userModel.getUserById(userId);
+        response.status(200).json(users);
+    } catch (error) {
+        console.error("Error fetching users:", error); // Log the error for debugging
+        response.status(500).json({ message: "Não foi possível buscar usuários", details: error.message });
+    }
+};
+
 // Função para pegar usuário por id:
 const getUsersByRole = async (request, response) => {
     const { id } = request.params; // Extrai o 'id' da URL
@@ -105,5 +117,6 @@ module.exports = {
     userRegistration,
     userAdressRegistration,
     getUsersByRole,
+    getUserById,
     getUsers
 };
