@@ -191,7 +191,7 @@ const EditUserPage = () => {
 
         <Row gutter={24} justify="space-between">
           <Col span={12}>
-            <Button danger size="large" style={{ width: "100%" }}>
+            <Button danger size="large" style={{ width: "100%" }} loading={isLoading} disabled>
               Excluir usuário
             </Button>
           </Col>
@@ -201,6 +201,7 @@ const EditUserPage = () => {
               htmlType="submit"
               size="large"
               style={{ width: "100%" }}
+              loading={isLoading}
             >
               Salvar
             </Button>
