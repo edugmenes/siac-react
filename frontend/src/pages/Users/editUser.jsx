@@ -10,8 +10,9 @@ import {
   Typography,
   notification,
 } from "antd";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getUsersById, updateUser } from "../../api/userAuthentication";
+import dayjs from "dayjs";
 
 const EditUserPage = () => {
   const [user, setUser] = useState();
@@ -19,20 +20,23 @@ const EditUserPage = () => {
   const [isLoading, setIsLoading] = useState();
   const [form] = Form.useForm();
   const { userId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsLoading(true);
     const fetchUser = async () => {
       try {
         const userData = await getUsersById(userId);
-        console.log(userData)
+        const dataNascimento = userData.data.data_nascimento
+          ? dayjs(userData.data.data_nascimento) // Converte para dayjs
+          : null;
         setUser(userData.data);
         form.setFieldsValue({
           nome: userData.data.nome,
           email: userData.data.email,
           celular: userData.data.celular,
           perfil: userData.data.perfil,
-          dataNascimento: userData.data.data_nascimento,
+          data_nascimento: dataNascimento,
         });
       } catch (error) {
         console.error("Erro ao buscar os usuários: ", error);
@@ -60,6 +64,7 @@ const EditUserPage = () => {
         message: "Sucesso",
         description: "Usuário atualizado com sucesso!",
       });
+      navigate("/users")
     } catch (error) {
       notification.error({
         message: "Erro",
