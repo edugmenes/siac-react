@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -8,29 +8,79 @@ import {
   Row,
   Col,
   Typography,
+  notification,
 } from "antd";
 import { useParams } from "react-router-dom";
+import { getUsersById, updateUser } from "../../api/userAuthentication";
 
 const EditUserPage = () => {
+  const [user, setUser] = useState();
+  const [perfilChanged, setPerfilChanged] = useState(false);
+  const [isLoading, setIsLoading] = useState();
   const [form] = Form.useForm();
   const { userId } = useParams();
 
-  console.log(userId);
-
-  const handleFinish = (values) => {
-    const formattedValues = {
-      ...values,
-      dataNascimento: values.dataNascimento
-        ? values.dataNascimento.format("YYYY-MM-DD")
-        : null,
+  useEffect(() => {
+    setIsLoading(true);
+    const fetchUser = async () => {
+      try {
+        const userData = await getUsersById(userId);
+        console.log(userData)
+        setUser(userData.data);
+        form.setFieldsValue({
+          nome: userData.data.nome,
+          email: userData.data.email,
+          celular: userData.data.celular,
+          perfil: userData.data.perfil,
+          dataNascimento: userData.data.data_nascimento,
+        });
+      } catch (error) {
+        console.error("Erro ao buscar os usuários: ", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    console.log("Dados do formulário:", formattedValues);
+
+    fetchUser();
+  }, []);
+
+  const handleFinish = async (values) => {
+    try {
+      setIsLoading(true);
+      const [key, label] = values.perfil.split("|");
+      const formattedValues = {
+        ...values,
+        data_nascimento: values.data_nascimento.format("YYYY-MM-DD"),
+        perfilId: perfilChanged ? key : user.id_perfil,
+        perfilLabel: perfilChanged ? label : user.perfil,
+        idUser: user.idUser
+      };
+      await updateUser(formattedValues);
+      notification.success({
+        message: "Sucesso",
+        description: "Usuário atualizado com sucesso!",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha na atualização: ${error.message}`,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div style={{ maxWidth: "600px", padding: "20px" }}>
-      <Typography.Title level={2}>Edição de Usuário</Typography.Title>
-      <Form form={form} layout="vertical" onFinish={handleFinish}>
+    <div style={{ maxWidth: "600px" }}>
+      <Typography.Title level={2} style={{ marginBottom: "30px" }}>
+        Edição de Usuário
+      </Typography.Title>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        disabled={isLoading}
+      >
         <Row gutter={24}>
           <Col span={24}>
             <Form.Item
@@ -105,6 +155,7 @@ const EditUserPage = () => {
                   { value: "1|administrador", label: "Administrador" },
                   { value: "5|psicologo", label: "Psicólogo" },
                 ]}
+                onChange={() => setPerfilChanged(true)}
               />
             </Form.Item>
           </Col>
@@ -115,6 +166,7 @@ const EditUserPage = () => {
             <Form.Item
               label="Data de Nascimento"
               name="data_nascimento"
+              style={{ marginBottom: "40px" }}
               rules={[
                 {
                   required: true,
@@ -126,6 +178,7 @@ const EditUserPage = () => {
                 format="DD/MM/YYYY"
                 size="large"
                 style={{ width: "100%" }}
+                placeholder="Selecione a data de nascimento"
               />
             </Form.Item>
           </Col>

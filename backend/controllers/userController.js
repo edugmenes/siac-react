@@ -62,6 +62,24 @@ const userRegistration = async (request, response) => {
     }
 };
 
+const userUpdate = async (request, response) => {
+  const { body } = request;
+  try {
+    await userModel.updateUser(body);
+    return response
+      .status(201)
+      .json({ message: "Usuário atualizado com sucesso!" });
+  } catch (error) {
+    if (error.message.includes("Email já cadastrado.")) {
+      return response.status(400).json({ message: error.message });
+    }
+
+    return response
+      .status(500)
+      .json({ message: "Erro na atualização de usuário" });
+  }
+};
+
 const userAdressRegistration = async (request, response) => {
     const { cep } = request.body;
     console.log(cep);
@@ -117,6 +135,7 @@ module.exports = {
     userRegistration,
     userAdressRegistration,
     getUsersByRole,
+    userUpdate,
     getUserById,
     getUsers
 };
