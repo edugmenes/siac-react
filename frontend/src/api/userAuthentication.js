@@ -45,9 +45,53 @@ const apiRegister = async (registerFormValues) => {
   }
 };
 
+const updateUser = async (userData) => {
+  try {
+    const response = await fetch(`${backendUrl}/update/${userData.idUser}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Falha ao atualizar usuário: ", error);
+    throw error;
+  }
+};
+
 const getUsers = async () => {
   try {
     const url = `${backendUrl}/users`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Erro ao buscar usuários: ", error);
+    return null;
+  }
+};
+
+const getUsersById = async (userId) => {
+  try {
+    const url = `${backendUrl}/users/${userId}`;
 
     const response = await fetch(url, {
       method: "GET",
@@ -94,6 +138,8 @@ const getUsersByRole = async (id) => {
 module.exports = {
   apiLogin,
   apiRegister,
+  updateUser,
   getUsersByRole,
+  getUsersById,
   getUsers
 };
