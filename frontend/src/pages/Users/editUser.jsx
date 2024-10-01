@@ -11,7 +11,7 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { getUsersById, updateUser } from "../../api/userAuthentication";
+import { deleteUser, getUsersById, updateUser } from "../../api/userAuthentication";
 import dayjs from "dayjs";
 
 const EditUserPage = () => {
@@ -48,6 +48,25 @@ const EditUserPage = () => {
     fetchUser();
   }, []);
 
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      await deleteUser(user.idUser)
+      notification.success({
+        message: "Sucesso",
+        description: "Usuário excluido com sucesso!",
+      });
+      navigate("/users");
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha na atualização: ${error.message}`,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleFinish = async (values) => {
     try {
       setIsLoading(true);
@@ -57,14 +76,14 @@ const EditUserPage = () => {
         data_nascimento: values.data_nascimento.format("YYYY-MM-DD"),
         perfilId: perfilChanged ? key : user.id_perfil,
         perfilLabel: perfilChanged ? label : user.perfil,
-        idUser: user.idUser
+        idUser: user.idUser,
       };
       await updateUser(formattedValues);
       notification.success({
         message: "Sucesso",
         description: "Usuário atualizado com sucesso!",
       });
-      navigate("/users")
+      navigate("/users");
     } catch (error) {
       notification.error({
         message: "Erro",
@@ -191,7 +210,13 @@ const EditUserPage = () => {
 
         <Row gutter={24} justify="space-between">
           <Col span={12}>
-            <Button danger size="large" style={{ width: "100%" }} loading={isLoading} disabled>
+            <Button
+              danger
+              size="large"
+              style={{ width: "100%" }}
+              loading={isLoading}
+              onClick={handleDelete}
+            >
               Excluir usuário
             </Button>
           </Col>

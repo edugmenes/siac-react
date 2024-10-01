@@ -127,10 +127,32 @@ const updateUser = async (userData) => {
   }
 };
 
+const deleteUser = async (idUser) => {
+  const deletedAt = new Date();
+
+  try {
+    const [result] = await promisePool.query(
+      `UPDATE usuario SET deletedAt = ? WHERE idUser = ?`,
+      [deletedAt, idUser]
+    );
+
+    if (result.affectedRows > 0) {
+      return {
+        success: true,
+        message: "Usuário excluído logicamente com sucesso!",
+      };
+    } else {
+      throw new Error("Falha ao excluir o usuário.");
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 const getUsers = async () => {
     try {
         const [users] = await promisePool.query(
-            `SELECT * FROM usuario`
+            `SELECT * FROM usuario AND deletedAt IS NULL`
         );
 
         if (users.length === 0) {
@@ -147,7 +169,7 @@ const getUsers = async () => {
 const getUserById = async (userId) => {
     try {
         const [user] = await promisePool.query(
-            `SELECT * FROM usuario WHERE idUser = ?`, [userId]
+            `SELECT * FROM usuario WHERE idUser = ? AND deletedAt IS NULL`, [userId]
         );
 
         if (user.length === 0) {
@@ -164,7 +186,7 @@ const getUserById = async (userId) => {
 const getUsersByRole = async (id) => {
     try {
         const [users] = await promisePool.query(
-            `SELECT * FROM usuario WHERE id_perfil = ?`, [id]  // Prevenção contra SQL Injection
+            `SELECT * FROM usuario WHERE id_perfil = ? AND deletedAt IS NULL`, [id]  // Prevenção contra SQL Injection
         );
 
         if (users.length === 0) {
@@ -183,6 +205,7 @@ module.exports = {
     getUserProfileAndPermissions,
     registerUserData,
     updateUser,
+    deleteUser,
     getUsersByRole,
     getUserById,
     getUsers
