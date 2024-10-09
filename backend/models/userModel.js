@@ -152,7 +152,7 @@ const deleteUser = async (idUser) => {
 const getUsers = async () => {
     try {
         const [users] = await promisePool.query(
-            `SELECT * FROM usuario AND deletedAt IS NULL`
+            `SELECT * FROM usuario WHERE deletedAt IS NULL`
         );
 
         if (users.length === 0) {
