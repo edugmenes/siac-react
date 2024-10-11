@@ -130,7 +130,7 @@ const updateUser = async (userData) => {
 const getUsers = async () => {
     try {
         const [users] = await promisePool.query(
-            `SELECT * FROM usuario`
+            `SELECT * FROM usuario WHERE deletedAt is null`
         );
 
         if (users.length === 0) {
