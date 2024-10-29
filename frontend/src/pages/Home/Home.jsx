@@ -36,7 +36,7 @@ const Home = () => {
         />
       )}
 
-      {hasPermission("cadastrar_agenda") && (
+      {hasPermission("criar_agenda") && (
         <CardComponent
           title="Criar Agendas"
           pathImage={calendarImage}
