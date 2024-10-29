@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { apiAgendaCreation } from "../../api/agenda";
 
 const { Option } = Select;
 
@@ -38,7 +39,7 @@ const CreateAgenda = () => {
     setSelectedEndTime(value);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const formattedValues = {
       data: values.data ? dayjs(values.data).format("DD/MM/YYYY") : null,
       horaInicio: values.horaInicio
@@ -50,7 +51,18 @@ const CreateAgenda = () => {
 
     setAgendas((prevAgendas) => [...prevAgendas, formattedValues]);
 
-    message.success("Agenda adicionada à tabela!");
+    try {
+      await apiAgendaCreation(formattedValues, authToken);
+      notification.success({
+        message: "Sucesso",
+        description: "Agenda adicionada à tabela!",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha no agendamento: ${error.message}`,
+      });
+    }
   };
 
   const handleSaveAgenda = () => {

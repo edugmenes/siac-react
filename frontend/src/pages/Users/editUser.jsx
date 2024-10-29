@@ -11,7 +11,7 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { getUsersById, updateUser } from "../../api/userAuthentication";
+import { getUsersById, updateUser } from "../../api/authentication";
 import dayjs from "dayjs";
 
 const EditUserPage = () => {
@@ -57,14 +57,14 @@ const EditUserPage = () => {
         data_nascimento: values.data_nascimento.format("YYYY-MM-DD"),
         perfilId: perfilChanged ? key : user.id_perfil,
         perfilLabel: perfilChanged ? label : user.perfil,
-        idUser: user.idUser
+        idUser: user.idUser,
       };
       await updateUser(formattedValues);
       notification.success({
         message: "Sucesso",
         description: "Usuário atualizado com sucesso!",
       });
-      navigate("/users")
+      navigate("/users");
     } catch (error) {
       notification.error({
         message: "Erro",
@@ -191,7 +191,13 @@ const EditUserPage = () => {
 
         <Row gutter={24} justify="space-between">
           <Col span={12}>
-            <Button danger size="large" style={{ width: "100%" }} loading={isLoading} disabled>
+            <Button
+              danger
+              size="large"
+              style={{ width: "100%" }}
+              loading={isLoading}
+              disabled
+            >
               Excluir usuário
             </Button>
           </Col>

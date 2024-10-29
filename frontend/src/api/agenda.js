@@ -1,9 +1,8 @@
 const backendUrl = "http://localhost:5000";
 
-debugger;
-const apiAppointmentScheduling = async (formValues, authToken) => {
+const apiAgendaCreation = async (formValues, authToken) => {
     try {
-        const response = await fetch(`${backendUrl}/appointment/scheduling`, {
+        const response = await fetch(`${backendUrl}/create/agenda`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
@@ -24,5 +23,5 @@ const apiAppointmentScheduling = async (formValues, authToken) => {
 }
 
 module.exports = {
-    apiAppointmentScheduling
+    apiAgendaCreation
 };

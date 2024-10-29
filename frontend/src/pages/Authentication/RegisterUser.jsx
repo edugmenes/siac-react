@@ -7,7 +7,7 @@ import {
   RightOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
-import { apiRegister } from "../../api/userAuthentication";
+import { apiRegister } from "../../api/authentication";
 import backgroundImage from "../../images/login-background-v2.jpg";
 
 const { Item } = Form;
@@ -48,15 +48,15 @@ const RegisterUser = () => {
       };
       await apiRegister(formattedData);
       notification.success({
-        message: 'Sucesso',
-        description: 'Usuário cadastrado com sucesso!',
+        message: "Sucesso",
+        description: "Usuário cadastrado com sucesso!",
       });
       navigate("/"); // Redireciona para a página inicial após o cadastro bem-sucedido
     } catch (error) {
       notification.error({
-        message: 'Erro',
+        message: "Erro",
         description: `Falha no cadastro: ${error.message}`,
-      });    
+      });
     }
   };
 
