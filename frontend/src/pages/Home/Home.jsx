@@ -44,7 +44,7 @@ const Home = () => {
         />
       )}
 
-      {hasPermission("cadastrar_prontuarios") && (
+      {hasPermission("criar_prontuario") && (
         <CardComponent
           title="Prontuários"
           pathImage={scheduleImage}
