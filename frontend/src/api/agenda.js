@@ -1,14 +1,15 @@
 const backendUrl = "http://localhost:5000";
 
-const apiAgendaCreation = async (formValues, authToken) => {
+//debugger;
+const apiAgendaCreation = async (agendas, authToken) => {
     try {
-        const response = await fetch(`${backendUrl}/create/agenda`, {
+        const response = await fetch(`${backendUrl}/agenda/creation`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formValues),
+            body: JSON.stringify({ agendas }),
         });
 
         if (!response.ok) {

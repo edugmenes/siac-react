@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 const userRoutes = require('./routes/userRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
-const agendaCreation = require('./routes/agendaRoutes');
+const agendaRoutes = require('./routes/agendaRoutes');
 
 // Configura middleware do CORS:
 app.use(cors({
@@ -21,10 +21,7 @@ app.use('/', userRoutes);
 app.use('/auth', userRoutes);
 app.use('/user', userRoutes);
 app.use('/appointment', appointmentRoutes);
-app.post('/agenda/creation', (req, res) => {
-    console.log('Bateu no servidor!');
-    res.status(200).json({ message: 'Requisição POST recebida com sucesso!' });
-});
+app.post('/agenda', agendaRoutes);
 
 
 // Inicializa servidor:
