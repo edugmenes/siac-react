@@ -24,11 +24,13 @@ const userLogin = async (request, response) => {
 
         // Buscar perfil e permissões:
         const userPermissions = await userModel.getUserProfileAndPermissions(user.idUser);
+        console.log("Dados retornados por getUserProfileAndPermissions:", userPermissions);
+
         if (!userPermissions || userPermissions.length === 0) {
             return response.status(404).json({ message: 'Perfil ou permissões não encontrados: ' });
         }
 
-        const permissions = userPermissions.map(permissions => permissions.permission);
+        const permissions = userPermissions.map(permissions => permissions.permissao);
         const profile = userPermissions[0].perfil;
 
         // Gerar o token JWT:
@@ -63,21 +65,21 @@ const userRegistration = async (request, response) => {
 };
 
 const userUpdate = async (request, response) => {
-  const { body } = request;
-  try {
-    await userModel.updateUser(body);
-    return response
-      .status(201)
-      .json({ message: "Usuário atualizado com sucesso!" });
-  } catch (error) {
-    if (error.message.includes("Email já cadastrado.")) {
-      return response.status(400).json({ message: error.message });
-    }
+    const { body } = request;
+    try {
+        await userModel.updateUser(body);
+        return response
+            .status(201)
+            .json({ message: "Usuário atualizado com sucesso!" });
+    } catch (error) {
+        if (error.message.includes("Email já cadastrado.")) {
+            return response.status(400).json({ message: error.message });
+        }
 
-    return response
-      .status(500)
-      .json({ message: "Erro na atualização de usuário" });
-  }
+        return response
+            .status(500)
+            .json({ message: "Erro na atualização de usuário" });
+    }
 };
 
 const userAdressRegistration = async (request, response) => {
