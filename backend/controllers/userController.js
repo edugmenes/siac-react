@@ -24,7 +24,6 @@ const userLogin = async (request, response) => {
 
         // Buscar perfil e permissões:
         const userPermissions = await userModel.getUserProfileAndPermissions(user.idUser);
-        console.log("Dados retornados por getUserProfileAndPermissions:", userPermissions);
 
         if (!userPermissions || userPermissions.length === 0) {
             return response.status(404).json({ message: 'Perfil ou permissões não encontrados: ' });

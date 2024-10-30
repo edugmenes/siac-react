@@ -21,7 +21,7 @@ app.use('/', userRoutes);
 app.use('/auth', userRoutes);
 app.use('/user', userRoutes);
 app.use('/appointment', appointmentRoutes);
-app.post('/agenda', agendaRoutes);
+app.use('/agenda', agendaRoutes);
 
 
 // Inicializa servidor:
