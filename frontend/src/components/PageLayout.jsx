@@ -160,7 +160,7 @@ const PageLayout = () => {
             ))}
           </Menu>
         </Sider>
-        <Layout style={{ padding: "0 24px 24px", height: "100vh" }}>
+        <Layout style={{ padding: "0 24px 24px" }}>
           <Content
             className="site-layout-background"
             style={{
