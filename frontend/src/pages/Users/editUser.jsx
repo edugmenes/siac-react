@@ -11,7 +11,11 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { getUsersById, updateUser } from "../../api/authentication";
+import {
+  deleteUser,
+  getUsersById,
+  updateUser,
+} from "../../api/userAuthentication";
 import dayjs from "dayjs";
 
 const EditUserPage = () => {
@@ -47,6 +51,25 @@ const EditUserPage = () => {
 
     fetchUser();
   }, []);
+
+  const handleDelete = async () => {
+    try {
+      setIsLoading(true);
+      await deleteUser(user.idUser);
+      notification.success({
+        message: "Sucesso",
+        description: "Usuário excluido com sucesso!",
+      });
+      navigate("/users");
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha na atualização: ${error.message}`,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFinish = async (values) => {
     try {
@@ -196,7 +219,7 @@ const EditUserPage = () => {
               size="large"
               style={{ width: "100%" }}
               loading={isLoading}
-              disabled
+              onClick={handleDelete}
             >
               Excluir usuário
             </Button>

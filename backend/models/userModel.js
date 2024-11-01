@@ -75,56 +75,78 @@ const registerUserData = async (registerFormData) => {
 }
 
 const updateUser = async (userData) => {
-  const {
-    idUser,
-    nome,
-    email,
-    perfilLabel,
-    perfilId,
-    celular,
-    data_nascimento,
-  } = userData;
+    const {
+        idUser,
+        nome,
+        email,
+        perfilLabel,
+        perfilId,
+        celular,
+        data_nascimento,
+    } = userData;
 
-  try {
-    const [existingUser] = await promisePool.query(
-      `SELECT * FROM usuario WHERE idUser = ?`,
-      [idUser]
-    );
+    try {
+        const [existingUser] = await promisePool.query(
+            `SELECT * FROM usuario WHERE idUser = ?`,
+            [idUser]
+        );
 
-    if (existingUser.length === 0) {
-      throw new Error("Usuário não encontrado.");
+        if (existingUser.length === 0) {
+            throw new Error("Usuário não encontrado.");
+        }
+
+        const [emailUser] = await promisePool.query(
+            `SELECT * FROM usuario WHERE email = ? AND idUser != ?`,
+            [email, idUser]
+        );
+
+        if (emailUser.length > 0) {
+            throw new Error("Email já cadastrado por outro usuário.");
+        }
+
+        const [result] = await promisePool.query(
+            `UPDATE usuario SET nome = ?, email = ?, perfil = ?, id_perfil = ?, celular = ?, data_nascimento = ? WHERE idUser = ?`,
+            [nome, email, perfilLabel, perfilId, celular, data_nascimento, idUser]
+        );
+
+        const [updatePerfil] = await promisePool.query(
+            `UPDATE usuario_perfil SET id_perfil = ? WHERE id_usuario = ?`,
+            [perfilId, idUser]
+        );
+
+        if (result.affectedRows > 0) {
+            return {
+                success: true,
+                message: "Usuário atualizado com sucesso!",
+            };
+        } else {
+            throw new Error("Falha ao atualizar o usuário.");
+        }
+    } catch (error) {
+        throw new Error(error.message);
     }
+};
 
-    const [emailUser] = await promisePool.query(
-      `SELECT * FROM usuario WHERE email = ? AND idUser != ?`,
-      [email, idUser]
-    );
+const deleteUser = async (idUser) => {
+    const deletedAt = new Date();
 
-    if (emailUser.length > 0) {
-      throw new Error("Email já cadastrado por outro usuário.");
+    try {
+        const [result] = await promisePool.query(
+            `UPDATE usuario SET deletedAt = ? WHERE idUser = ?`,
+            [deletedAt, idUser]
+        );
+
+        if (result.affectedRows > 0) {
+            return {
+                success: true,
+                message: "Usuário excluído logicamente com sucesso!",
+            };
+        } else {
+            throw new Error("Falha ao excluir o usuário.");
+        }
+    } catch (error) {
+        throw new Error(error.message);
     }
-
-    const [result] = await promisePool.query(
-      `UPDATE usuario SET nome = ?, email = ?, perfil = ?, id_perfil = ?, celular = ?, data_nascimento = ? WHERE idUser = ?`,
-      [nome, email, perfilLabel, perfilId, celular, data_nascimento, idUser]
-    );
-
-    const [updatePerfil] = await promisePool.query(
-      `UPDATE usuario_perfil SET id_perfil = ? WHERE id_usuario = ?`,
-      [perfilId, idUser]
-    );
-
-    if (result.affectedRows > 0) {
-      return {
-        success: true,
-        message: "Usuário atualizado com sucesso!",
-      };
-    } else {
-      throw new Error("Falha ao atualizar o usuário.");
-    }
-  } catch (error) {
-    throw new Error(error.message);
-  }
 };
 
 const getUsers = async () => {
@@ -147,7 +169,7 @@ const getUsers = async () => {
 const getUserById = async (userId) => {
     try {
         const [user] = await promisePool.query(
-            `SELECT * FROM usuario WHERE idUser = ?`, [userId]
+            `SELECT * FROM usuario WHERE idUser = ? AND deletedAt IS NULL`, [userId]
         );
 
         if (user.length === 0) {
@@ -164,7 +186,7 @@ const getUserById = async (userId) => {
 const getUsersByRole = async (id) => {
     try {
         const [users] = await promisePool.query(
-            `SELECT * FROM usuario WHERE id_perfil = ?`, [id]  // Prevenção contra SQL Injection
+            `SELECT * FROM usuario WHERE id_perfil = ? AND deletedAt IS NULL`, [id]  // Prevenção contra SQL Injection
         );
 
         if (users.length === 0) {
@@ -183,6 +205,7 @@ module.exports = {
     getUserProfileAndPermissions,
     registerUserData,
     updateUser,
+    deleteUser,
     getUsersByRole,
     getUserById,
     getUsers

@@ -7,7 +7,8 @@ const {
     //userAdressRegistration,
     getUsers,
     getUserById,
-    userUpdate
+    userUpdate,
+    deleteUser
 } = require('../controllers/userController');
 
 // Rota para função de login:
@@ -16,6 +17,7 @@ router.post('/login', userLogin);
 router.get('/users', getUsers);
 router.get('/users/:userId', getUserById)
 router.post('/update/:userId', userUpdate)
+router.put('/user/delete', deleteUser)
 
 // Rota para função de capturar usuários por id:
 router.get('/roleId/:id', getUsersByRole);

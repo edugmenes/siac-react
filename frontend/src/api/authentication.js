@@ -66,6 +66,28 @@ const updateUser = async (userData) => {
   }
 };
 
+const deleteUser = async (idUser) => {
+  try {
+    const response = await fetch(`${backendUrl}/user/delete`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ idUser }), 
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Falha ao excluir usuário: ", error);
+    throw error;
+  }
+};
+
 const getUsers = async () => {
   try {
     const url = `${backendUrl}/users`;
@@ -141,5 +163,6 @@ module.exports = {
   updateUser,
   getUsersByRole,
   getUsersById,
-  getUsers
+  deleteUser,
+  getUsers,
 };
