@@ -12,11 +12,13 @@ import {
   TimePicker,
   Typography,
   message,
+  notification,
 } from "antd";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { apiAgendaCreation } from "../../api/agenda";
 
 const { Option } = Select;
 
@@ -38,7 +40,7 @@ const CreateAgenda = () => {
     setSelectedEndTime(value);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const formattedValues = {
       data: values.data ? dayjs(values.data).format("DD/MM/YYYY") : null,
       horaInicio: values.horaInicio
@@ -49,14 +51,30 @@ const CreateAgenda = () => {
     };
 
     setAgendas((prevAgendas) => [...prevAgendas, formattedValues]);
-
-    message.success("Agenda adicionada à tabela!");
   };
 
-  const handleSaveAgenda = () => {
-    // Lógica para salvar todas as agendas no backend
+  const handleSaveAgenda = async () => {
     console.log("Salvando agendas:", agendas);
-    message.success("Agendas salvas com sucesso!");
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+      console.error("Token não encontrado no localStorage");
+      return;
+    }
+
+    try {
+      await apiAgendaCreation(agendas, authToken);
+      notification.success({
+        message: "Sucesso",
+        description: "Agendas salvas com sucesso!",
+      });
+      setAgendas([]); // Limpa as agendas após salvar
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha ao salvar agendas: ${error.message}`,
+      });
+    }
   };
 
   const handleDelete = (record) => {

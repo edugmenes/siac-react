@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 const userRoutes = require('./routes/userRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const agendaRoutes = require('./routes/agendaRoutes');
 
 // Configura middleware do CORS:
 app.use(cors({
@@ -20,6 +21,8 @@ app.use('/', userRoutes);
 app.use('/auth', userRoutes);
 app.use('/user', userRoutes);
 app.use('/appointment', appointmentRoutes);
+app.use('/agenda', agendaRoutes);
+
 
 // Inicializa servidor:
 const PORT = process.env.PORT || 5000;

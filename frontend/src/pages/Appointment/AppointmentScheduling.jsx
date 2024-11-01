@@ -14,8 +14,8 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
-import { getUsersByRole } from "../../api/userAuthentication";
-import { apiAppointmentScheduling } from "../../api/appointmentScheduling";
+import { getUsersByRole } from "../../api/authentication";
+import { apiAppointmentScheduling } from "../../api/appointment";
 
 const AppointmentScheduling = () => {
   const [selectedDate, setSelectedDate] = useState(null);

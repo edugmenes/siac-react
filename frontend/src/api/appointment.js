@@ -1,6 +1,6 @@
 const backendUrl = "http://localhost:5000";
 
-debugger;
+//debugger;
 const apiAppointmentScheduling = async (formValues, authToken) => {
     try {
         const response = await fetch(`${backendUrl}/appointment/scheduling`, {

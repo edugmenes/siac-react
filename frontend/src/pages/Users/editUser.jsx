@@ -11,7 +11,11 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteUser, getUsersById, updateUser } from "../../api/userAuthentication";
+import {
+  deleteUser,
+  getUsersById,
+  updateUser,
+} from "../../api/userAuthentication";
 import dayjs from "dayjs";
 
 const EditUserPage = () => {
@@ -51,7 +55,7 @@ const EditUserPage = () => {
   const handleDelete = async () => {
     try {
       setIsLoading(true);
-      await deleteUser(user.idUser)
+      await deleteUser(user.idUser);
       notification.success({
         message: "Sucesso",
         description: "Usuário excluido com sucesso!",

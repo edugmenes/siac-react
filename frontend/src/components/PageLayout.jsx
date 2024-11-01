@@ -160,7 +160,7 @@ const PageLayout = () => {
             ))}
           </Menu>
         </Sider>
-        <Layout style={{ padding: "0 24px 24px", height: "100vh" }}>
+        <Layout style={{ padding: "0 24px 24px" }}>
           <Content
             className="site-layout-background"
             style={{
@@ -171,7 +171,14 @@ const PageLayout = () => {
           >
             <Outlet />
           </Content>
-          <Footer style={{ textAlign: "center" }}>
+          <Footer
+            style={{
+              textAlign: "center",
+              width: "100%",
+              padding: "10px 0",
+              backgroundColor: "#f5f5f5",
+            }}
+          >
             SIAC ©{new Date().getFullYear()} Todos os direitos reservados.
           </Footer>
         </Layout>
