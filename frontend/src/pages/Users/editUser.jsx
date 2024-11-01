@@ -11,11 +11,7 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  deleteUser,
-  getUsersById,
-  updateUser,
-} from "../../api/userAuthentication";
+import { deleteUser, getUsersById, updateUser } from "../../api/authentication";
 import dayjs from "dayjs";
 
 const EditUserPage = () => {
