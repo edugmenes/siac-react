@@ -23,6 +23,29 @@ const apiAppointmentScheduling = async (formValues, authToken) => {
     }
 }
 
+const getAppointments = async () => {
+  try {
+    console.log('3')
+    const url = `${backendUrl}/appointment/get`;
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log('response', response)
+
+    // const data = await response.json();
+    // return data
+  } catch (error) {
+    console.error("Erro ao buscar usuários: ", error);
+    return null;
+  }
+};
+
 module.exports = {
-    apiAppointmentScheduling
+    apiAppointmentScheduling,
+    getAppointments
 };

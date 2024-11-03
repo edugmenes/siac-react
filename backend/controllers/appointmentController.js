@@ -71,6 +71,31 @@ const appointmentScheduling = async (request, response) => {
     }
 };
 
+const getAppointments = async (request, response) => {
+    try {
+        // Chame o método do modelo e verifique o retorno
+        const users = await appointmentModel.getAppointments();
+        
+        console.log('Users fetched from model:', users);
+
+        // Verifique se o dado é válido e não está vazio
+        if (!users || users.length === 0) {
+            console.log('No appointments found.');
+            return response.status(404).json({ message: 'Nenhuma consulta encontrada' });
+        }
+
+        // Se houver dados, envie a resposta com status 200
+        response.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        response.status(500).json({
+            message: 'Não foi possível buscar consultas',
+            details: error.message,
+        });
+    }
+};
+
+
 // Função para calcular a hora de término
 const calculateEndTime = (time) => {
     const [hours, minutes] = time.split(':').map(Number); // Divide a hora e os minutos
@@ -85,5 +110,6 @@ const calculateEndTime = (time) => {
 
 module.exports = {
     appointmentScheduling,
-    agendaCreation
+    agendaCreation,
+    getAppointments
 };

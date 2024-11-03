@@ -46,7 +46,31 @@ const registerHours = async (formValues, idUser, idAgenda) => {
     }
 };
 
+const getAppointments = async () => {
+    try {
+        // Correção: Remova o uso de desestruturação que assume que o retorno é um array.
+        const [appointments] = await promisePool.query(
+            `SELECT * FROM horario WHERE status = 'agendado'`
+        );
+
+        // Correção: Verifique se appointments é um array antes de acessar a propriedade length.
+        if (!Array.isArray(appointments) || appointments.length === 0) {
+            return { success: false, message: 'Nenhuma consulta encontrada' };
+        }
+
+        console.log('app', appointments[0]);
+
+        // Retorne todos os appointments se quiser devolver a lista completa; 
+        // aqui o código original retornava apenas o primeiro item.
+        return { success: true, data: appointments };
+    } catch (error) {
+        console.error('Erro ao buscar consultas: ', error);
+        return { success: false, message: 'Erro ao buscar consultas', details: error.message };
+    }
+};
+
 module.exports = {
     registerAgenda,
-    registerHours
+    registerHours,
+    getAppointments
 };
