@@ -1,7 +1,8 @@
 import { Button, Row, Table, Typography } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { getAppointments } from "../../api/appointment";
 
 const Appointment = () => {
   const navigate = useNavigate();
@@ -10,6 +11,20 @@ const Appointment = () => {
     navigate("/appointments/schedule");
   };
 
+  const fetchAppointments = async () => {
+    try {
+      console.log("2");
+      const response = await getAppointments();
+      console.log("response", response);
+    } catch (error) {
+      console.error("Erro ao buscar compromissos:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []); // Array vazio para executar apenas na montagem
+
   const mockedData = [
     {
       id: 211010201,
@@ -17,6 +32,7 @@ const Appointment = () => {
       time: "10:00",
       professional: "Henrique",
       status: "Encerrado",
+      key: 2, // Adicione uma key única, que pode ser o mesmo valor do id
     },
     {
       id: 367534352,
@@ -24,6 +40,7 @@ const Appointment = () => {
       time: "12:00",
       professional: "Raul",
       status: "Agendado",
+      key: 1, // Adicione uma key única
     },
     {
       id: 53213231231,
@@ -31,6 +48,7 @@ const Appointment = () => {
       time: "11:30",
       professional: "Felipe",
       status: "Agendado",
+      key: 3, // Adicione uma key única
     },
     {
       id: 1231231241,
@@ -38,6 +56,7 @@ const Appointment = () => {
       time: "17:00",
       professional: "Edu",
       status: "Agendado",
+      key: 4, // Adicione uma key única
     },
   ];
 
@@ -58,7 +77,6 @@ const Appointment = () => {
       key: "professional",
     },
     {
-      // TODO: Tratar coluna status
       title: "Status",
       dataIndex: "status",
       key: "status",
@@ -92,11 +110,7 @@ const Appointment = () => {
         </Button>
       </Row>
       <Row>
-        <Table
-          columns={columns}
-          dataSource={mockedData}
-          style={{ width: "100%" }}
-        />
+        <Table columns={columns} dataSource={mockedData} style={{ width: "100%" }} />
       </Row>
     </>
   );
