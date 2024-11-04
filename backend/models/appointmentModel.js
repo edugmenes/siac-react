@@ -58,7 +58,7 @@ const getAppointments = async () => {
             return { success: false, message: 'Nenhuma consulta encontrada' };
         }
 
-        console.log('app', appointments[0]);
+        //console.log('Resultado da model:', appointments);
 
         // Retorne todos os appointments se quiser devolver a lista completa; 
         // aqui o código original retornava apenas o primeiro item.

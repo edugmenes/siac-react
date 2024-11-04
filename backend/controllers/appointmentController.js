@@ -41,7 +41,7 @@ const appointmentScheduling = async (request, response) => {
         // Formatar a data e calcular a hora de término
         const formattedDate = formatDate(date);
         const dayOfWeek = getDayOfWeek(date);
-        const endTime = calculateEndTime(time); a
+        const endTime = calculateEndTime(time);
 
         // Registrar a agenda e capturar o idAgenda
         const agendaResult = await appointmentModel.registerAgenda({
@@ -72,20 +72,20 @@ const appointmentScheduling = async (request, response) => {
 };
 
 const getAppointments = async (request, response) => {
+    //console.log('Chegou na controller para getAppointments');
     try {
         // Chame o método do modelo e verifique o retorno
-        const users = await appointmentModel.getAppointments();
-        
-        console.log('Users fetched from model:', users);
+        const appointments = await appointmentModel.getAppointments();
+        //console.log('Resultado da model que bateu na controller getAppointments:', appointments);
 
         // Verifique se o dado é válido e não está vazio
-        if (!users || users.length === 0) {
+        if (!appointments || appointments.length === 0) {
             console.log('No appointments found.');
             return response.status(404).json({ message: 'Nenhuma consulta encontrada' });
         }
 
         // Se houver dados, envie a resposta com status 200
-        response.status(200).json(users);
+        response.status(200).json(appointments);
     } catch (error) {
         console.error('Error fetching appointments:', error);
         response.status(500).json({
