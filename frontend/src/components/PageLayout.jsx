@@ -101,7 +101,7 @@ const PageLayout = () => {
   }, []);
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: "100vh" }}>
       <Header
         className="header"
         style={{
@@ -160,7 +160,7 @@ const PageLayout = () => {
             ))}
           </Menu>
         </Sider>
-        <Layout style={{ padding: "0 24px 24px" }}>
+        <Layout style={{ padding: "0 24px 24px", flex: 1 }}>
           <Content
             className="site-layout-background"
             style={{
