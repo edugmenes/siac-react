@@ -74,7 +74,7 @@ const UsersList = () => {
         align="middle"
         style={{ marginBottom: "40px" }}
       >
-        <Typography.Title level={2}>Consultas</Typography.Title>
+        <Typography.Title level={2}> Usuários </Typography.Title>
         <Button type="link" size="large" onClick={handleCreate}>
           <PlusOutlined /> Criar usuário
         </Button>

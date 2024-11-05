@@ -39,7 +39,7 @@ const App = () => (
           element={<ProtectedRoute element={Documents} />}
         />
         <Route
-          path="appointment"
+          path="appointments"
           element={<ProtectedRoute element={Appointment} />}
         />
         <Route
@@ -47,9 +47,15 @@ const App = () => (
           element={<ProtectedRoute element={AppointmentScheduling} />}
         />
         <Route path="bin" element={<ProtectedRoute element={Bin} />} />
-        <Route path="users/:userId" element={<ProtectedRoute element={EditUserPage} />} />
+        <Route
+          path="users/:userId"
+          element={<ProtectedRoute element={EditUserPage} />}
+        />
         <Route path="users" element={<ProtectedRoute element={UsersList} />} />
-        <Route path="/medical/patient-records" element={<ProtectedRoute element={PatitentRecors} />} />
+        <Route
+          path="/medical/patient-records"
+          element={<ProtectedRoute element={PatitentRecors} />}
+        />
         <Route
           path="settings"
           element={<ProtectedRoute element={Settings} />}

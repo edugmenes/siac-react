@@ -1,64 +1,43 @@
 import { Button, Row, Table, Typography } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"; // Importa useState
 import { useNavigate } from "react-router-dom";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { getAppointments } from "../../api/appointment";
 
 const Appointment = () => {
   const navigate = useNavigate();
+  const [appointments, setAppointments] = useState([]); // Estado para armazenar consultas
 
   const handleClick = () => {
-    navigate("/appointments/schedule");
+    navigate("/appointment/scheduling");
   };
 
   const fetchAppointments = async () => {
     try {
-      console.log("2");
       const response = await getAppointments();
       console.log("response", response);
+
+      // Verifica se a resposta foi bem-sucedida e se os dados existem
+      if (response && response.success) {
+        // Mapeia os dados para o formato que a tabela espera
+        const formattedAppointments = response.data.map((appointment) => ({
+          key: appointment.idHorario, // Chave única para cada entrada
+          date: appointment.hora.split(" ")[0], // Se precisar de apenas a data
+          time: appointment.hora.split(" ")[1], // Se precisar apenas do horário
+          professional: appointment.idPsico, // ou outro campo que você queira mostrar
+          status: appointment.status,
+        }));
+
+        setAppointments(formattedAppointments); // Atualiza o estado com os dados formatados
+      }
     } catch (error) {
-      console.error("Erro ao buscar compromissos:", error);
+      console.error("Erro ao buscar consultas:", error);
     }
   };
 
   useEffect(() => {
     fetchAppointments();
   }, []); // Array vazio para executar apenas na montagem
-
-  const mockedData = [
-    {
-      id: 211010201,
-      date: "15/08/2024",
-      time: "10:00",
-      professional: "Henrique",
-      status: "Encerrado",
-      key: 2, // Adicione uma key única, que pode ser o mesmo valor do id
-    },
-    {
-      id: 367534352,
-      date: "20/10/2024",
-      time: "12:00",
-      professional: "Raul",
-      status: "Agendado",
-      key: 1, // Adicione uma key única
-    },
-    {
-      id: 53213231231,
-      date: "22/10/2024",
-      time: "11:30",
-      professional: "Felipe",
-      status: "Agendado",
-      key: 3, // Adicione uma key única
-    },
-    {
-      id: 1231231241,
-      date: "30/10/2024",
-      time: "17:00",
-      professional: "Edu",
-      status: "Agendado",
-      key: 4, // Adicione uma key única
-    },
-  ];
 
   const columns = [
     {
@@ -88,7 +67,7 @@ const Appointment = () => {
         <Button
           size="large"
           type="link"
-          onClick={() => navigate(`/appointments/schedule/${record.id}`)}
+          onClick={() => navigate(`/appointments/schedule/${record.key}`)}
         >
           <EditOutlined style={{ fontSize: "18px" }} />
         </Button>
@@ -104,13 +83,17 @@ const Appointment = () => {
         align="middle"
         style={{ marginBottom: "40px" }}
       >
-        <Typography.Title level={2}>Consultas</Typography.Title>
+        <Typography.Title level={2}> Consultas </Typography.Title>
         <Button type="link" size="large" onClick={handleClick}>
           <PlusOutlined /> Criar consulta
         </Button>
       </Row>
       <Row>
-        <Table columns={columns} dataSource={mockedData} style={{ width: "100%" }} />
+        <Table
+          columns={columns}
+          dataSource={appointments} // Usa o estado de appointments
+          style={{ width: "100%" }}
+        />
       </Row>
     </>
   );
