@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import CardComponent from "../../components/Card";
 import calendarImage from "../../images/calendar-button.png";
 import scheduleImage from "../../images/notes-button.png";
+import actionImage from "../../images/action-button.png";
+import dashboardImage from "../../images/dashboard-button.png";
+import folderImage from "../../images/folder-button.png";
 import { jwtDecode } from "jwt-decode";
 
 const Home = () => {
@@ -27,11 +30,26 @@ const Home = () => {
   };
 
   return (
-    <div style={{ display: "flex" }}>
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "5px",
+        justifyContent: "left",
+      }}
+    >
+      {hasPermission("full_access") && (
+        <CardComponent
+          title="Painel"
+          pathImage={dashboardImage}
+          redirectPath="/panel/dashboards"
+        />
+      )}
+
       {hasPermission("agendar_consultas") && (
         <CardComponent
           title="Agendar Consultas"
-          pathImage={calendarImage}
+          pathImage={actionImage}
           redirectPath="/appointment/scheduling"
         />
       )}
@@ -47,8 +65,16 @@ const Home = () => {
       {hasPermission("criar_prontuario") && (
         <CardComponent
           title="Prontuários"
-          pathImage={scheduleImage}
+          pathImage={folderImage}
           redirectPath="/medical/patient-records"
+        />
+      )}
+
+      {hasPermission("criar_relatorios") && (
+        <CardComponent
+          title="Relatórios"
+          pathImage={scheduleImage}
+          redirectPath="/reports"
         />
       )}
     </div>

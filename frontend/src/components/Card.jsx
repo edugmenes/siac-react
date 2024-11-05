@@ -11,7 +11,12 @@ const CardComponent = ({ title, pathImage, redirectPath }) => {
 
   return (
     <Card
-      style={{ width: 300, cursor: "pointer", marginLeft: "30px" }}
+      style={{
+        width: 300,
+        cursor: "pointer",
+        marginLeft: "30px",
+        marginBottom: "20px",
+      }}
       cover={<img alt="exemplo" src={pathImage} onClick={handleClick} />}
     >
       <div
@@ -19,7 +24,7 @@ const CardComponent = ({ title, pathImage, redirectPath }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "flex-end",
-          height: "40px",
+          height: "30px",
           marginTop: "auto",
         }}
       >
