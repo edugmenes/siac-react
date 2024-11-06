@@ -56,7 +56,20 @@ const registerHours = async (formValues, idUser, idAgenda) => {
 const getAppointments = async () => {
   try {
     const [appointments] = await promisePool.query(
-      `SELECT * FROM horario WHERE status = 'agendado'`
+        `
+        SELECT 
+            h.*, 
+            u1.nome AS paciente, 
+            u2.nome AS psicologo,
+            a.data AS dia
+        FROM 
+            horario h
+            INNER JOIN usuario u1 ON h.idUser = u1.idUser
+            INNER JOIN usuario u2 ON h.idPsico = u2.idUser
+            INNER JOIN agenda a ON h.idAgenda = a.idAgenda 
+        WHERE
+            h.status = 'agendado';
+        `
     );
 
     if (!Array.isArray(appointments) || appointments.length === 0) {
@@ -74,8 +87,29 @@ const getAppointments = async () => {
   }
 };
 
+const deleteAppointment = async (idHorario) => {
+    try {
+        const [result] = await promisePool.query(
+            `DELETE FROM horario WHERE idHorario = ?`,
+            [idHorario]
+        );
+
+        if (result.affectedRows > 0) {
+            return {
+                success: true,
+                message: "Consulta excluída com sucesso!",
+            };
+        } else {
+            throw new Error("Falha ao excluir a consulta.");
+        }
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 module.exports = {
   registerAgenda,
   registerHours,
   getAppointments,
+  deleteAppointment
 };

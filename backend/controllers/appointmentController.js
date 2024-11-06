@@ -108,8 +108,24 @@ const calculateEndTime = (time) => {
     return endTime.toTimeString().slice(0, 5);
 };
 
+const deleteAppointment = async (request, response) => {
+    const { idHorario } = request.body;
+  
+    try {
+      await appointmentModel.deleteAppointment(idHorario);
+      return response
+        .status(200)
+        .json({ message: "Consulta excluida com sucesso!" });
+    } catch (error) {
+      return response
+        .status(500)
+        .json({ message: "Erro ao excluir consulta" });
+    }
+};
+
 module.exports = {
     appointmentScheduling,
     agendaCreation,
-    getAppointments
+    getAppointments,
+    deleteAppointment
 };
