@@ -1,12 +1,12 @@
 import { Button, Row, Table, Typography } from "antd";
-import React, { useEffect, useState } from "react"; // Importa useState
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { getAppointments } from "../../api/appointment";
 
 const Appointment = () => {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState([]); // Estado para armazenar consultas
+  const [appointments, setAppointments] = useState([]);
 
   const handleClick = () => {
     navigate("/appointment/scheduling");
@@ -17,18 +17,16 @@ const Appointment = () => {
       const response = await getAppointments();
       console.log("response", response);
 
-      // Verifica se a resposta foi bem-sucedida e se os dados existem
       if (response && response.success) {
-        // Mapeia os dados para o formato que a tabela espera
         const formattedAppointments = response.data.map((appointment) => ({
-          key: appointment.idHorario, // Chave única para cada entrada
-          date: appointment.hora.split(" ")[0], // Se precisar de apenas a data
-          time: appointment.hora.split(" ")[1], // Se precisar apenas do horário
-          professional: appointment.idPsico, // ou outro campo que você queira mostrar
+          key: appointment.idHorario,
+          date: appointment.hora.split(" ")[0],
+          time: appointment.hora.split(" ")[1],
+          professional: appointment.idPsico,
           status: appointment.status,
         }));
 
-        setAppointments(formattedAppointments); // Atualiza o estado com os dados formatados
+        setAppointments(formattedAppointments);
       }
     } catch (error) {
       console.error("Erro ao buscar consultas:", error);
@@ -37,7 +35,7 @@ const Appointment = () => {
 
   useEffect(() => {
     fetchAppointments();
-  }, []); // Array vazio para executar apenas na montagem
+  }, []);
 
   const columns = [
     {
@@ -91,7 +89,7 @@ const Appointment = () => {
       <Row>
         <Table
           columns={columns}
-          dataSource={appointments} // Usa o estado de appointments
+          dataSource={appointments}
           style={{ width: "100%" }}
         />
       </Row>
