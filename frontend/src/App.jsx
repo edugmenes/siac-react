@@ -13,6 +13,7 @@ import AppointmentScheduling from "./pages/Appointment/AppointmentScheduling.jsx
 import UsersList from "./pages/Users/usersList.jsx";
 import EditUserPage from "./pages/Users/editUser.jsx";
 import PatitentRecors from "./pages/Medical/PatientRecords.jsx";
+import Dashboard from "./pages/Panel/Dashboards.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
 const ProtectedRoute = ({ element: Element, ...rest }) => {
@@ -59,6 +60,10 @@ const App = () => (
         <Route
           path="settings"
           element={<ProtectedRoute element={Settings} />}
+        />
+        <Route
+          path="/panel/dashboards"
+          element={<ProtectedRoute element={Dashboard} />}
         />
       </Route>
     </Routes>
