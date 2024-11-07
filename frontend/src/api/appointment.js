@@ -49,7 +49,31 @@ const getAppointments = async () => {
   }
 };
 
+const deleteAppointment = async (idHorario) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/delete`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ idHorario }), 
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Falha ao excluir consulta: ", error);
+    throw error;
+  }
+};
+
+
 module.exports = {
   apiAppointmentScheduling,
-  getAppointments
+  getAppointments,
+  deleteAppointment
 };

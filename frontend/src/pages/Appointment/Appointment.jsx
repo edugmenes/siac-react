@@ -1,12 +1,12 @@
-import { Button, Row, Table, Typography } from "antd";
-import React, { useEffect, useState } from "react"; // Importa useState
+import { Badge, Button, Modal, notification, Row, Table, Typography } from "antd";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { getAppointments } from "../../api/appointment";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { deleteAppointment, getAppointments } from "../../api/appointment";
 
 const Appointment = () => {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState([]); // Estado para armazenar consultas
+  const [appointments, setAppointments] = useState([]);
 
   const handleClick = () => {
     navigate("/appointment/scheduling");
@@ -15,50 +15,68 @@ const Appointment = () => {
   const fetchAppointments = async () => {
     try {
       const response = await getAppointments();
-      console.log("response", response);
 
-      // Verifica se a resposta foi bem-sucedida e se os dados existem
       if (response && response.success) {
-        // Mapeia os dados para o formato que a tabela espera
-        const formattedAppointments = response.data.map((appointment) => ({
-          key: appointment.idHorario, // Chave única para cada entrada
-          date: appointment.hora.split(" ")[0], // Se precisar de apenas a data
-          time: appointment.hora.split(" ")[1], // Se precisar apenas do horário
-          professional: appointment.idPsico, // ou outro campo que você queira mostrar
-          status: appointment.status,
-        }));
-
-        setAppointments(formattedAppointments); // Atualiza o estado com os dados formatados
+        setAppointments(response.data);
       }
     } catch (error) {
       console.error("Erro ao buscar consultas:", error);
     }
   };
 
+  const handleDelete = async (idHorario) => {
+    console.log(idHorario);
+    try {
+      await deleteAppointment(idHorario);
+      notification.success({
+        message: "Sucesso",
+        description: "Consulta excluida com sucesso!",
+      });
+      navigate("/appointments");
+    } catch (error) {
+      notification.error({
+        message: "Erro",
+        description: `Falha na exclusão: ${error.message}`,
+      });
+    }
+  };
+
   useEffect(() => {
     fetchAppointments();
-  }, []); // Array vazio para executar apenas na montagem
+  }, []);
 
   const columns = [
     {
       title: "Data",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "dia",
+      key: "dia",
+      render: (text) =>
+        new Date(text).toLocaleDateString("pt-BR", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }),
     },
     {
       title: "Horário",
-      dataIndex: "time",
-      key: "time",
+      dataIndex: "hora",
+      key: "hora",
     },
     {
       title: "Profissional",
-      dataIndex: "professional",
-      key: "professional",
+      dataIndex: "psicologo",
+      key: "psicologo",
+    },
+    {
+      title: "Paciente",
+      dataIndex: "paciente",
+      key: "paciente",
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      render: (status) => <Badge color="yellow" text={status} />,
     },
     {
       title: "Ações",
@@ -67,12 +85,21 @@ const Appointment = () => {
         <Button
           size="large"
           type="link"
-          onClick={() => navigate(`/appointments/schedule/${record.key}`)}
+          onClick={() => {
+            Modal.confirm({
+              title: "Tem certeza que deseja excluir?",
+              content: `Você está prestes a excluir a consulta do paciente ${record.paciente}.`,
+              okText: "Sim",
+              cancelText: "Não",
+              onOk: () => handleDelete(record.idHorario),
+              maskClosable: true,
+              centered: true
+            });
+          }}
         >
-          <EditOutlined style={{ fontSize: "18px" }} />
+          <DeleteOutlined style={{ fontSize: "18px", color: "red" }} />
         </Button>
       ),
-      width: 100,
     },
   ];
 
@@ -91,7 +118,7 @@ const Appointment = () => {
       <Row>
         <Table
           columns={columns}
-          dataSource={appointments} // Usa o estado de appointments
+          dataSource={appointments}
           style={{ width: "100%" }}
         />
       </Row>
