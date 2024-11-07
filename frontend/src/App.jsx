@@ -14,6 +14,7 @@ import UsersList from "./pages/Users/usersList.jsx";
 import EditUserPage from "./pages/Users/editUser.jsx";
 import PatitentRecors from "./pages/Medical/PatientRecords.jsx";
 import Dashboard from "./pages/Panel/Dashboards.jsx";
+import InternalReports from "./pages/Reports/InternReports.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
 const ProtectedRoute = ({ element: Element, ...rest }) => {
@@ -64,6 +65,10 @@ const App = () => (
         <Route
           path="/panel/dashboards"
           element={<ProtectedRoute element={Dashboard} />}
+        />
+        <Route
+          path="/reports"
+          element={<ProtectedRoute element={InternalReports} />}
         />
       </Route>
     </Routes>
