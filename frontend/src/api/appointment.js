@@ -1,4 +1,4 @@
-const backendUrl = "http://localhost:5000";
+const backendUrl = "https://siac-api.ddns.net";
 
 //debugger;
 const apiAppointmentScheduling = async (formValues, authToken) => {
