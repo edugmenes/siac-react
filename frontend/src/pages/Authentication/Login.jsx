@@ -136,12 +136,13 @@ const Login = () => {
             </Button>
           </Form.Item>
 
-          <Form.Item>
+          {/*Funcionalidade de cadastro de usuários foi transferida para dentro do sistema*/
+          /* <Form.Item>
             <Text type="secondary">
               Ainda não tem conta?{" "}
               <Link to="/register-user">Cadastre-se aqui</Link>
             </Text>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </div>
 

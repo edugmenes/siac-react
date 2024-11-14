@@ -11,7 +11,7 @@ import {
   message,
 } from "antd";
 import jsPDF from "jspdf";
-import { jwtDecode } from "jwt-decode";
+//import { jwtDecode } from "jwt-decode";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -25,7 +25,7 @@ const InternshipReport = () => {
     const token = localStorage.getItem("authToken");
 
     if (token) {
-      const decodedToken = jwtDecode(token);
+      //const decodedToken = jwtDecode(token);
 
       if (true /*decodedToken.perfil === "professor"*/) {
         // Se o perfil for "professor", preenche o campo e o desabilita
