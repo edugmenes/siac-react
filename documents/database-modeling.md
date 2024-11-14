@@ -32,7 +32,7 @@ CREATE TABLE `perfil` (
 
 Tabela `permissao` :
 
-```
+```sql
 CREATE TABLE `permissao` (
   `id` int NOT NULL,
   `nome` varchar(50) NOT NULL,
