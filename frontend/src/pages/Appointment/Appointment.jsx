@@ -1,4 +1,12 @@
-import { Badge, Button, Modal, notification, Row, Table, Typography } from "antd";
+import {
+  Badge,
+  Button,
+  Modal,
+  notification,
+  Row,
+  Table,
+  Typography,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
@@ -17,13 +25,16 @@ const Appointment = () => {
       const response = await getAppointments();
 
       if (response && response.success) {
-        setAppointments(response.data);
+        // Ordena as consultas pela data em ordem decrescente
+        const sortedData = response.data.sort(
+          (a, b) => new Date(b.dia) - new Date(a.dia)
+        );
+        setAppointments(sortedData);
       }
     } catch (error) {
       console.error("Erro ao buscar consultas:", error);
     }
   };
-
   const handleDelete = async (idHorario) => {
     console.log(idHorario);
     try {
@@ -93,7 +104,7 @@ const Appointment = () => {
               cancelText: "Não",
               onOk: () => handleDelete(record.idHorario),
               maskClosable: true,
-              centered: true
+              centered: true,
             });
           }}
         >
