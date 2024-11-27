@@ -3,6 +3,7 @@ import { Button, Row, Space, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getUsers } from "../../api/user";
+
 const UsersList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -17,19 +18,24 @@ const UsersList = () => {
     navigate(`/users/${record.idUser}`);
   };
 
-  useEffect(() => {
+  const fetchUsers = async () => {
     setIsLoading(true);
-    const fetchUsers = async () => {
-      try {
-        const response = await getUsers();
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar os usuários: ", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    try {
+      const response = await getUsers();
 
+      if (response && response.data) {
+        // Ordena os usuários pelo `idUser` em ordem decrescente
+        const sortedUsers = response.data.sort((a, b) => b.idUser - a.idUser);
+        setUsers(sortedUsers);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar os usuários: ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
 
@@ -38,21 +44,25 @@ const UsersList = () => {
       title: "Nome",
       dataIndex: "nome",
       key: "nome",
+      width: 220,
     },
     {
       title: "E-Mail",
       dataIndex: "email",
       key: "email",
+      width: 300,
     },
     {
       title: "Celular",
       dataIndex: "celular",
       key: "celular",
+      width: 200,
     },
     {
       title: "Perfil",
       dataIndex: "perfil",
       key: "perfil",
+      width: 195,
     },
     {
       title: "Ações",
@@ -80,7 +90,12 @@ const UsersList = () => {
         </Button>
       </Row>
       <Row>
-        <Table columns={columns} dataSource={users} style={{ width: "100%" }} />
+        <Table
+          columns={columns}
+          dataSource={users}
+          loading={isLoading}
+          style={{ width: "100%" }}
+        />
       </Row>
     </>
   );
