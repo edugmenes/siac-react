@@ -1,4 +1,4 @@
-const backendUrl = "https://siac-api.ddns.net";
+const backendUrl = "http://localhost:5000";
 
 const apiLogin = async (email, password) => {
   try {
@@ -25,8 +25,10 @@ const apiLogin = async (email, password) => {
 };
 
 const apiRegister = async (registerFormValues) => {
+  console.log("Chegou na API");
+  console.log(registerFormValues);
   try {
-    const response = await fetch(`${backendUrl}/auth/register`, {
+    const response = await fetch(`${backendUrl}/user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +75,7 @@ const deleteUser = async (idUser) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idUser }), 
+      body: JSON.stringify({ idUser }),
     });
 
     if (!response.ok) {

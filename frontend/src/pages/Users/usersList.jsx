@@ -2,7 +2,7 @@ import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Row, Space, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "../../api/authentication";
+import { getUsers } from "../../api/user";
 const UsersList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
@@ -10,7 +10,7 @@ const UsersList = () => {
   const navigate = useNavigate();
 
   const handleCreate = () => {
-    navigate("/users/new");
+    navigate("/users/register");
   };
 
   const handleEdit = (record) => {

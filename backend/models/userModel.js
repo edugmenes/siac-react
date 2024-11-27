@@ -37,8 +37,9 @@ const getUserProfileAndPermissions = async (idUser) => {
 
 // Cadastra usuário no banco de dados:
 const registerUserData = async (registerFormData) => {
+    console.log("Chegou na model!");
     const { nomeUser, email, perfilLabel, perfilId, password } = registerFormData;
-
+    console.log(registerFormData);
     try {
         const [existingUser] = await promisePool.query(
             `SELECT * FROM usuario WHERE email = ?`,

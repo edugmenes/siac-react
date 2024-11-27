@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Checkbox, Form, Input, Grid, Typography } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
-import { apiLogin } from "../../api/authentication";
+import { apiLogin } from "../../api/user";
 import backgroundImage from "../../images/login-background.jpg";
 import ForgotPasswordModal from "./ForgotPassword"; // Importe o modal
 

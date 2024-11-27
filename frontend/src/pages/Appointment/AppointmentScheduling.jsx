@@ -14,7 +14,7 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
-import { getUsersByRole } from "../../api/authentication";
+import { getUsersByRole } from "../../api/user";
 import { apiAppointmentScheduling } from "../../api/appointment";
 
 const AppointmentScheduling = () => {
