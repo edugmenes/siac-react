@@ -7,7 +7,7 @@ import {
   RightOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
-import { apiRegister } from "../../api/authentication";
+import { apiRegister } from "../../api/user";
 import backgroundImage from "../../images/login-background-v2.jpg";
 
 const { Item } = Form;
