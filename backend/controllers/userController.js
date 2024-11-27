@@ -49,9 +49,8 @@ const userLogin = async (request, response) => {
 
 // Funções para cadastro de usuário:
 const userRegistration = async (request, response) => {
-    console.log("Chegou controller!");
     const { body } = request;
-    console.log(body);
+
     try {
         await userModel.registerUserData(body)
         return response.status(201).json({ message: 'Usuário cadastrado com sucesso!' })

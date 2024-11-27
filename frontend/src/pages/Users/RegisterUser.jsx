@@ -136,10 +136,10 @@ const RegisterUserPage = () => {
                     placeholder="Selecione o perfil"
                     size="large"
                     options={[
+                      { value: "1|administrador", label: "Administrador" },
                       { value: "2|paciente", label: "Paciente" },
                       { value: "4|professor", label: "Professor" },
                       { value: "3|recepcionista", label: "Recepcionista" },
-                      { value: "1|administrador", label: "Administrador" },
                       { value: "5|psicologo", label: "Psicólogo" },
                     ]}
                   />
