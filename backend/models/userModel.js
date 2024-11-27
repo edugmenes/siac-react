@@ -38,7 +38,7 @@ const getUserProfileAndPermissions = async (idUser) => {
 // Cadastra usuário no banco de dados:
 const registerUserData = async (registerFormData) => {
     console.log("Chegou na model!");
-    const { nomeUser, email, perfilLabel, perfilId, password } = registerFormData;
+    const { nome, email, perfilLabel, perfilId, senha } = registerFormData;
     console.log(registerFormData);
     try {
         const [existingUser] = await promisePool.query(
@@ -52,7 +52,7 @@ const registerUserData = async (registerFormData) => {
 
         const [result] = await promisePool.query(
             `INSERT INTO usuario (nome, email, password, perfil, id_perfil) VALUES (?, ?, ?, ?, ?)`,
-            [nomeUser, email, password, perfilLabel, perfilId]
+            [nome, email, senha, perfilLabel, perfilId]
         );
 
         const [usuarioPerfil] = await promisePool.query(

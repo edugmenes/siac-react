@@ -1,4 +1,6 @@
-const backendUrl = "https://siac-api.ddns.net";
+//const backendUrl = "https://siac-api.ddns.net";
+const backendUrl = " http://localhost:5000";
+
 
 //debugger;
 const apiAppointmentScheduling = async (formValues, authToken) => {
@@ -56,7 +58,7 @@ const deleteAppointment = async (idHorario) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idHorario }), 
+      body: JSON.stringify({ idHorario }),
     });
 
     if (!response.ok) {
