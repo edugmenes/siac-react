@@ -1,62 +1,99 @@
 import React, { useState } from "react";
 import {
   Button,
+  Checkbox,
   Col,
   ConfigProvider,
   DatePicker,
   Divider,
   Form,
   Row,
-  Select,
   Table,
   TimePicker,
   Typography,
-  message,
   notification,
 } from "antd";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { apiAgendaCreation } from "../../api/agenda";
-
-const { Option } = Select;
 
 const CreateAgenda = () => {
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedFinalDate, setSelectedFinalDate] = useState(null);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
   const [selectedEndTime, setSelectedEndTime] = useState(null);
+  const [enableFinalDate, setEnableFinalDate] = useState(false);
   const [agendas, setAgendas] = useState([]);
 
-  const handleDateChange = (value) => {
-    setSelectedDate(value);
+  // Calcular o dia da semana com base na data
+  const calculateDayOfWeek = (date) => {
+    const days = [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado",
+    ];
+    return days[dayjs(date).day()];
   };
 
-  const handleStartTimeChange = (value) => {
-    setSelectedStartTime(value);
-  };
+  const handleDateChange = (value) => setSelectedDate(value);
+  const handleFinalDateChange = (value) => setSelectedFinalDate(value);
+  const handleStartTimeChange = (value) => setSelectedStartTime(value);
+  const handleEndTimeChange = (value) => setSelectedEndTime(value);
 
-  const handleEndTimeChange = (value) => {
-    setSelectedEndTime(value);
-  };
+  const handleSubmit = () => {
+    let newEntries = [];
+    const currentAgendas = agendas.map((agenda) => agenda.data); // Datas já existentes
 
-  const handleSubmit = async (values) => {
-    const formattedValues = {
-      data: values.data ? dayjs(values.data).format("DD/MM/YYYY") : null,
-      horaInicio: values.horaInicio
-        ? dayjs(values.horaInicio).format("HH:mm")
-        : null,
-      horaFim: values.horaFim ? dayjs(values.horaFim).format("HH:mm") : null,
-      diaSemana: values.diaSemana,
-    };
+    if (enableFinalDate && selectedDate && selectedFinalDate) {
+      let currentDate = dayjs(selectedDate);
 
-    setAgendas((prevAgendas) => [...prevAgendas, formattedValues]);
+      while (currentDate <= dayjs(selectedFinalDate)) {
+        const formattedDate = currentDate.format("DD/MM/YYYY");
+
+        // Adicionar apenas datas não duplicadas
+        if (!currentAgendas.includes(formattedDate)) {
+          newEntries.push({
+            data: formattedDate,
+            horaInicio: selectedStartTime.format("HH:mm"),
+            horaFim: selectedEndTime.format("HH:mm"),
+            diaSemana: calculateDayOfWeek(currentDate),
+          });
+        }
+        currentDate = currentDate.add(1, "day");
+      }
+    } else if (selectedDate) {
+      const formattedDate = dayjs(selectedDate).format("DD/MM/YYYY");
+
+      // Adicionar apenas se a data não existir
+      if (!currentAgendas.includes(formattedDate)) {
+        newEntries.push({
+          data: formattedDate,
+          horaInicio: selectedStartTime.format("HH:mm"),
+          horaFim: selectedEndTime.format("HH:mm"),
+          diaSemana: calculateDayOfWeek(selectedDate),
+        });
+      }
+    }
+
+    // Atualizar tabela apenas com novas entradas
+    if (newEntries.length > 0) {
+      setAgendas((prevAgendas) => [...prevAgendas, ...newEntries]);
+    } else {
+      notification.warning({
+        message: "Atenção",
+        description: "Nenhuma data nova foi adicionada.",
+      });
+    }
   };
 
   const handleSaveAgenda = async () => {
-    console.log("Salvando agendas:", agendas);
     const authToken = localStorage.getItem("authToken");
-
     if (!authToken) {
       console.error("Token não encontrado no localStorage");
       return;
@@ -68,7 +105,7 @@ const CreateAgenda = () => {
         message: "Sucesso",
         description: "Agendas salvas com sucesso!",
       });
-      setAgendas([]); // Limpa as agendas após salvar
+      setAgendas([]);
     } catch (error) {
       notification.error({
         message: "Erro",
@@ -81,7 +118,6 @@ const CreateAgenda = () => {
     setAgendas((prevAgendas) =>
       prevAgendas.filter((agenda) => agenda !== record)
     );
-    message.success("Agenda removida!");
   };
 
   const columns = [
@@ -89,6 +125,7 @@ const CreateAgenda = () => {
       title: "Data",
       dataIndex: "data",
       key: "data",
+      width: 110,
     },
     {
       title: "Hora de Início",
@@ -109,196 +146,96 @@ const CreateAgenda = () => {
       title: "Ações",
       key: "actions",
       render: (_, record) => (
-        <>
-          <Button
-            size="large"
-            type="link"
-            onClick={() => console.log(`Editando: ${record.data}`)}
-          >
-            <EditOutlined style={{ fontSize: "18px" }} />
-          </Button>
-          <Button size="large" type="link" onClick={() => handleDelete(record)}>
-            <DeleteOutlined style={{ fontSize: "18px", color: "red" }} />
-          </Button>
-        </>
+        <Button size="small" type="link" onClick={() => handleDelete(record)}>
+          <DeleteOutlined style={{ fontSize: "14px", color: "red" }} />
+        </Button>
       ),
-      width: 150,
+      width: 100,
     },
   ];
 
-  const disabledHours = () => {
-    const hours = [];
-    for (let i = 0; i < 24; i++) {
-      if (i < 7 || i >= 19) {
-        hours.push(i);
-      }
-    }
-    return hours;
-  };
-
-  const disabledMinutes = (selectedHour) => {
-    const minutes = [];
-    for (let i = 0; i < 60; i++) {
-      if (i % 15 !== 0) {
-        minutes.push(i);
-      }
-    }
-    return minutes;
-  };
-
-  const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
-  };
-
   return (
     <>
-      <Typography.Title level={2} style={{ marginBottom: "40px" }}>
+      <Typography.Title level={2} style={{ marginBottom: "30px" }}>
         Criar Agenda de Atendimento
       </Typography.Title>
-      <Row gutter={16}>
+      <Row gutter={32}>
         <Col span={12}>
-          <Form
-            layout="vertical"
-            onFinish={handleSubmit}
-            style={{ width: "97%" }}
-          >
+          <Form layout="vertical">
             <ConfigProvider locale={ptBR}>
-              <div>
-                <Row style={{ marginBottom: "20px" }}>
-                  <Col span={24}>
-                    <Form.Item
-                      label="Selecione a data"
-                      name="data"
-                      rules={[
-                        { required: true, message: "Selecione uma data" },
-                      ]}
-                    >
-                      <DatePicker
-                        onChange={handleDateChange}
-                        format="DD/MM/YYYY"
-                        style={{ width: "100%" }}
-                        size="large"
-                        placeholder="Selecione o dia"
-                        disabledDate={disabledDate}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row gutter={16} style={{ marginBottom: "20px" }}>
-                  <Col span={12}>
-                    <Form.Item
-                      label="Hora de Início"
-                      name="horaInicio"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Selecione a hora de início",
-                        },
-                      ]}
-                    >
-                      <TimePicker
-                        format="HH:mm"
-                        onChange={handleStartTimeChange}
-                        showTime={{
-                          hideDisabledOptions: true,
-                          disabledHours,
-                          disabledMinutes,
-                        }}
-                        style={{ width: "100%" }}
-                        size="large"
-                        placeholder="Selecione o horário de início"
-                        disabled={!selectedDate}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item
-                      label="Hora de Fim"
-                      name="horaFim"
-                      rules={[
-                        { required: true, message: "Selecione a hora de fim" },
-                      ]}
-                    >
-                      <TimePicker
-                        format="HH:mm"
-                        onChange={handleEndTimeChange}
-                        showTime={{
-                          hideDisabledOptions: true,
-                          disabledHours,
-                          disabledMinutes,
-                        }}
-                        style={{ width: "100%" }}
-                        size="large"
-                        placeholder="Selecione o horário de fim"
-                        disabled={!selectedStartTime}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={24}>
-                    <Form.Item
-                      label="Dia da Semana"
-                      name="diaSemana"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Selecione o dia da semana",
-                        },
-                      ]}
-                    >
-                      <Select
-                        style={{ width: "100%" }}
-                        size="large"
-                        placeholder="Selecione o dia da semana"
-                        disabled={!selectedEndTime}
-                      >
-                        <Option value="Segunda-feira">Segunda-feira</Option>
-                        <Option value="Terça-feira">Terça-feira</Option>
-                        <Option value="Quarta-feira">Quarta-feira</Option>
-                        <Option value="Quinta-feira">Quinta-feira</Option>
-                        <Option value="Sexta-feira">Sexta-feira</Option>
-                        <Option value="Sábado">Sábado</Option>
-                        <Option value="Domingo">Domingo</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Divider />
-                <Row
-                  justify="start"
-                  align="middle"
-                  style={{ marginTop: "30px" }}
+              <Form.Item>
+                <Checkbox
+                  onChange={(e) => setEnableFinalDate(e.target.checked)}
                 >
-                  <Col>
-                    <Button
-                      type="link"
-                      icon={
-                        <PlusOutlined
-                          style={{
-                            fontSize: "20px",
-                            border: "2px solid #1890ff",
-                            borderRadius: "50%",
-                            padding: "5px",
-                          }}
-                        />
-                      }
+                  Inserir conjunto de datas
+                </Checkbox>
+              </Form.Item>
+              <Form.Item
+                label="Data Inicial"
+                required
+                rules={[{ required: true, message: "Selecione uma data" }]}
+              >
+                <DatePicker
+                  onChange={handleDateChange}
+                  format="DD/MM/YYYY"
+                  style={{ width: "100%" }}
+                  size="large"
+                  disabledDate={(current) =>
+                    current && current < dayjs().startOf("day")
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="Data Final">
+                <DatePicker
+                  onChange={handleFinalDateChange}
+                  format="DD/MM/YYYY"
+                  style={{ width: "100%" }}
+                  size="large"
+                  disabled={!enableFinalDate}
+                  disabledDate={(current) =>
+                    current && current <= dayjs(selectedDate).startOf("day")
+                  }
+                />
+              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item label="Hora de Início" required>
+                    <TimePicker
+                      format="HH:mm"
+                      onChange={handleStartTimeChange}
+                      style={{ width: "100%" }}
                       size="large"
-                      htmlType="submit"
-                      style={{ marginRight: "10px" }}
-                    >
-                      Adicionar
-                    </Button>
-                    <Button
+                      disabled={!selectedDate}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Hora de Fim" required>
+                    <TimePicker
+                      format="HH:mm"
+                      onChange={handleEndTimeChange}
+                      style={{ width: "100%" }}
                       size="large"
-                      type="primary"
-                      onClick={handleSaveAgenda}
-                    >
-                      Salvar Agenda
-                    </Button>
-                  </Col>
-                </Row>
-              </div>
+                      disabled={!selectedStartTime}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Divider />
+              <Row>
+                <Col>
+                  <Button
+                    type="link"
+                    icon={<PlusOutlined style={{ fontSize: "16px" }} />}
+                    onClick={handleSubmit}
+                  >
+                    Adicionar
+                  </Button>
+                  <Button type="primary" onClick={handleSaveAgenda}>
+                    Salvar Agenda
+                  </Button>
+                </Col>
+              </Row>
             </ConfigProvider>
           </Form>
         </Col>
@@ -309,9 +246,9 @@ const CreateAgenda = () => {
             rowKey={(record) =>
               `${record.data}-${record.horaInicio}-${record.diaSemana}`
             }
-            pagination={false}
+            pagination={{ pageSize: 5 }}
             bordered
-            style={{ width: "100%", marginBottom: "30px" }} // Increased bottom margin
+            style={{ width: "100%" }}
           />
         </Col>
       </Row>
