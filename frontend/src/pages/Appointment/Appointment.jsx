@@ -9,7 +9,11 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  CalendarOutlined,
+} from "@ant-design/icons";
 import { deleteAppointment, getAppointments } from "../../api/appointment";
 
 const Appointment = () => {
@@ -35,21 +39,33 @@ const Appointment = () => {
       console.error("Erro ao buscar consultas:", error);
     }
   };
+
   const handleDelete = async (idHorario) => {
-    console.log(idHorario);
     try {
       await deleteAppointment(idHorario);
       notification.success({
         message: "Sucesso",
         description: "Consulta excluida com sucesso!",
       });
-      navigate("/appointments");
+      fetchAppointments();
     } catch (error) {
       notification.error({
         message: "Erro",
         description: `Falha na exclusão: ${error.message}`,
       });
     }
+  };
+
+  const handleReschedule = (record) => {
+    Modal.confirm({
+      title: "Tem certeza que deseja remarcar a consulta?",
+      content: `Você está prestes a remarcar a consulta do paciente ${record.paciente}.`,
+      okText: "Sim",
+      cancelText: "Não",
+      onOk: () => navigate(`/appointment/rescheduling/${record.idHorario}`),
+      maskClosable: true,
+      centered: true,
+    });
   };
 
   useEffect(() => {
@@ -61,6 +77,7 @@ const Appointment = () => {
       title: "Data",
       dataIndex: "dia",
       key: "dia",
+      width: 180,
       render: (text) =>
         new Date(text).toLocaleDateString("pt-BR", {
           year: "numeric",
@@ -72,6 +89,7 @@ const Appointment = () => {
       title: "Horário",
       dataIndex: "hora",
       key: "hora",
+      width: 160,
     },
     {
       title: "Profissional",
@@ -87,29 +105,73 @@ const Appointment = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => <Badge color="yellow" text={status} />,
+      render: (status) => {
+        let badgeProps = {};
+
+        switch (status) {
+          case "Agendada":
+            badgeProps = { color: "yellow", text: "Agendada" };
+            break;
+          case "Remarcada":
+            badgeProps = { color: "blue", text: "Remarcada" };
+            break;
+          case "Cancelada":
+            badgeProps = { color: "red", text: "Cancelada" };
+            break;
+          case "Concluída":
+            badgeProps = { color: "green", text: "Concluída" };
+            break;
+          default:
+            badgeProps = { color: "gray", text: "Indefinido" };
+        }
+
+        return <Badge color={badgeProps.color} text={badgeProps.text} />;
+      },
     },
     {
       title: "Ações",
       key: "actions",
+      align: "center",
+      width: 160,
       render: (_, record) => (
-        <Button
-          size="large"
-          type="link"
-          onClick={() => {
-            Modal.confirm({
-              title: "Tem certeza que deseja excluir?",
-              content: `Você está prestes a excluir a consulta do paciente ${record.paciente}.`,
-              okText: "Sim",
-              cancelText: "Não",
-              onOk: () => handleDelete(record.idHorario),
-              maskClosable: true,
-              centered: true,
-            });
-          }}
-        >
-          <DeleteOutlined style={{ fontSize: "18px", color: "red" }} />
-        </Button>
+        <>
+          <Button
+            size="large"
+            type="link"
+            onClick={() => {
+              Modal.confirm({
+                title: "Tem certeza que deseja cancelar?",
+                content: `Você está prestes a cancelar a consulta do paciente ${record.paciente}.`,
+                okText: "Sim",
+                cancelText: "Não",
+                onOk: () => handleDelete(record.idHorario),
+                maskClosable: true,
+                centered: true,
+              });
+            }}
+            disabled={record.status === "Cancelada"}
+          >
+            <DeleteOutlined
+              style={{
+                fontSize: "18px",
+                color: record.status === "Cancelada" ? "gray" : "red",
+              }}
+            />
+          </Button>
+          <Button
+            size="large"
+            type="link"
+            onClick={() => handleReschedule(record)}
+            disabled={record.status === "Cancelada"}
+          >
+            <CalendarOutlined
+              style={{
+                fontSize: "18px",
+                color: record.status === "Cancelada" ? "gray" : "blue",
+              }}
+            />
+          </Button>
+        </>
       ),
     },
   ];

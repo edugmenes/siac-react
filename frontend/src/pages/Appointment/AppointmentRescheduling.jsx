@@ -11,113 +11,88 @@ import {
   Typography,
   notification,
 } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { getUsersByRole } from "../../api/user";
-import { apiAppointmentScheduling } from "../../api/appointment";
+import { getAppointmentById } from "../../api/appointment";
 
-const AppointmentScheduling = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+const AppointmentRescheduling = () => {
+  const { recordId } = useParams();
+  const [form] = Form.useForm();
   const [doctors, setDoctors] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await getUsersByRole(5);
-        const doctorsToDropdown = response.data.map((d) => ({
+        // Obtém os dados da consulta pelo ID
+        const response = await getAppointmentById(recordId);
+        const consultationData = response?.data[0];
+
+        if (consultationData) {
+          form.setFieldsValue({
+            date: dayjs(consultationData.dia),
+            time: dayjs(consultationData.hora, "HH:mm"),
+            professional: consultationData.idPsico,
+            room: consultationData.sala || undefined,
+          });
+        }
+
+        // Obtém lista de psicos:
+        const usersResponse = await getUsersByRole(5);
+        const doctorsToDropdown = usersResponse.data.map((d) => ({
           label: d.nome,
           value: d.idUser,
         }));
         setDoctors(doctorsToDropdown);
+
+        // Mock de salas (pode ser substituído por uma API de salas)
+        const mockRooms = ["Sala 1", "Sala 2", "Sala 3"].map((room) => ({
+          label: room,
+          value: room,
+        }));
+        setRooms(mockRooms);
       } catch (error) {
-        console.error("Erro ao buscar psicólogos:", error);
+        console.error("Erro ao buscar dados iniciais:", error);
       }
     };
 
-    // Mock para as salas
-    const mockRooms = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"].map(
-      (room) => ({
-        label: room,
-        value: room,
-      })
-    );
-    setRooms(mockRooms);
-
-    fetchDoctors();
-  }, []);
-
-  const handleDateChange = (value) => {
-    setSelectedDate(value);
-  };
-
-  const handleTimeChange = (value) => {
-    setSelectedTime(value);
-  };
-
-  const handleProfessionalChange = (value) => {
-    console.log(value);
-  };
+    fetchInitialData();
+  }, [recordId, form]);
 
   const handleSubmit = async (values) => {
-    const formattedValues = {
-      ...values,
-      date: values.date ? dayjs(values.date).format("DD/MM/YYYY") : null,
-      time: values.time ? dayjs(values.time).format("HH:mm") : null,
-    };
-
-    const authToken = localStorage.getItem("authToken");
-    if (!authToken) {
-      console.error("Token não encontrado no localStorage");
-      return;
-    }
-
     try {
-      await apiAppointmentScheduling(formattedValues, authToken);
+      const formattedValues = {
+        ...values,
+        date: values.date.format("YYYY-MM-DD"),
+        time: values.time.format("HH:mm"),
+      };
+
       notification.success({
         message: "Sucesso",
-        description: "Consulta agendada com sucesso!",
+        description: "Consulta remarcada com sucesso!",
       });
     } catch (error) {
       notification.error({
         message: "Erro",
-        description: `Falha no agendamento: ${error.message}`,
+        description: `Falha ao remarcar consulta: ${error.message}`,
       });
     }
   };
 
-  const disabledHours = () => {
-    const hours = [];
-    for (let i = 0; i < 24; i++) {
-      if (i < 7 || i >= 19) {
-        hours.push(i);
-      }
-    }
-    return hours;
-  };
-
-  const disabledMinutes = (selectedHour) => {
-    const minutes = [];
-    for (let i = 0; i < 60; i++) {
-      if (i % 15 !== 0) {
-        minutes.push(i);
-      }
-    }
-    return minutes;
-  };
-
-  const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+  const handleCancel = () => {
+    navigate("/appointments");
   };
 
   return (
     <>
       <Typography.Title level={2} style={{ marginBottom: "40px" }}>
-        Agendar Consulta
+        Remarcar Consulta
       </Typography.Title>
-      <Form layout="vertical" onFinish={handleSubmit}>
+      <Form layout="vertical" form={form} onFinish={handleSubmit}>
         <ConfigProvider locale={ptBR}>
           <Row gutter={16}>
             <Col span={12}>
@@ -127,12 +102,10 @@ const AppointmentScheduling = () => {
                 rules={[{ required: true, message: "Selecione uma data" }]}
               >
                 <DatePicker
-                  onChange={handleDateChange}
                   format="DD/MM/YYYY"
                   style={{ width: "100%" }}
                   size="large"
                   placeholder="Selecione o dia"
-                  disabledDate={disabledDate}
                 />
               </Form.Item>
             </Col>
@@ -144,17 +117,10 @@ const AppointmentScheduling = () => {
               >
                 <DatePicker
                   picker="time"
-                  onChange={handleTimeChange}
-                  showTime={{
-                    hideDisabledOptions: true,
-                    disabledHours,
-                    disabledMinutes,
-                  }}
                   format="HH:mm"
                   style={{ width: "100%" }}
                   size="large"
                   placeholder="Selecione a hora"
-                  disabled={!selectedDate}
                 />
               </Form.Item>
             </Col>
@@ -170,11 +136,9 @@ const AppointmentScheduling = () => {
               >
                 <Select
                   style={{ width: "100%" }}
-                  onChange={handleProfessionalChange}
                   size="large"
                   placeholder="Selecione o profissional"
                   options={doctors}
-                  disabled={!selectedDate || !selectedTime}
                 />
               </Form.Item>
             </Col>
@@ -182,28 +146,30 @@ const AppointmentScheduling = () => {
               <Form.Item
                 label="Selecione a sala:"
                 name="room"
-                rules={[{ required: true, message: "Selecione uma sala" }]}
+                rules={[{ required: false }]}
               >
                 <Select
                   style={{ width: "100%" }}
                   size="large"
                   placeholder="Selecione a sala"
                   options={rooms}
-                  disabled={!selectedDate || !selectedTime}
                 />
               </Form.Item>
             </Col>
           </Row>
           <Divider />
-          <Row>
-            <Col span={2}>
+          <Row gutter={16}>
+            <Col>
               <Button
                 size="large"
                 htmlType="submit"
                 type="primary"
-                style={{ marginTop: "30px" }}
+                style={{ marginRight: "10px" }}
               >
-                Agendar consulta
+                Remarcar consulta
+              </Button>
+              <Button size="large" onClick={handleCancel}>
+                Cancelar
               </Button>
             </Col>
           </Row>
@@ -213,4 +179,4 @@ const AppointmentScheduling = () => {
   );
 };
 
-export default AppointmentScheduling;
+export default AppointmentRescheduling;

@@ -95,6 +95,29 @@ const getAppointments = async (request, response) => {
     }
 };
 
+const getAppointmentsById = async (request, response) => {
+    const { recordId } = request.params;
+
+    try {
+        // Chame o método do modelo e verifique o retorno
+        const appointments = await appointmentModel.getAppointmentsById(recordId);
+
+        // Verifique se o dado é válido e não está vazio
+        if (!appointments || appointments.length === 0) {
+            console.log('No appointments found.');
+            return response.status(404).json({ message: 'Nenhuma consulta encontrada' });
+        }
+
+        // Se houver dados, envie a resposta com status 200
+        response.status(200).json(appointments);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        response.status(500).json({
+            message: 'Não foi possível buscar consultas',
+            details: error.message,
+        });
+    }
+};
 
 // Função para calcular a hora de término
 const calculateEndTime = (time) => {
@@ -110,16 +133,16 @@ const calculateEndTime = (time) => {
 
 const deleteAppointment = async (request, response) => {
     const { idHorario } = request.body;
-  
+
     try {
-      await appointmentModel.deleteAppointment(idHorario);
-      return response
-        .status(200)
-        .json({ message: "Consulta excluida com sucesso!" });
+        await appointmentModel.deleteAppointment(idHorario);
+        return response
+            .status(200)
+            .json({ message: "Consulta excluida com sucesso!" });
     } catch (error) {
-      return response
-        .status(500)
-        .json({ message: "Erro ao excluir consulta" });
+        return response
+            .status(500)
+            .json({ message: "Erro ao excluir consulta" });
     }
 };
 
@@ -127,5 +150,6 @@ module.exports = {
     appointmentScheduling,
     agendaCreation,
     getAppointments,
+    getAppointmentsById,
     deleteAppointment
 };

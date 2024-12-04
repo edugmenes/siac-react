@@ -35,7 +35,7 @@ const registerHours = async (formValues, idUser, idAgenda) => {
   try {
     const [result] = await promisePool.query(
       `INSERT INTO horario (hora, idUser, disponibilidade, idAgenda, idPsico, status) VALUES (?, ?, ?, ?, ?, ?)`,
-      [initialTime, patient, 1, agenda, professional, "agendado"]
+      [initialTime, patient, 1, agenda, professional, 'Agendada']
     );
 
     return {
@@ -56,7 +56,7 @@ const registerHours = async (formValues, idUser, idAgenda) => {
 const getAppointments = async () => {
   try {
     const [appointments] = await promisePool.query(
-        `
+      `
         SELECT 
             h.*, 
             u1.nome AS paciente, 
@@ -68,7 +68,7 @@ const getAppointments = async () => {
             INNER JOIN usuario u2 ON h.idPsico = u2.idUser
             INNER JOIN agenda a ON h.idAgenda = a.idAgenda 
         WHERE
-            h.status = 'agendado';
+            h.status IN ('Agendada', 'Cancelada', 'Remarcada', 'Realizada');
         `
     );
 
@@ -87,29 +87,64 @@ const getAppointments = async () => {
   }
 };
 
-const deleteAppointment = async (idHorario) => {
-    try {
-        const [result] = await promisePool.query(
-            `DELETE FROM horario WHERE idHorario = ?`,
-            [idHorario]
-        );
+const getAppointmentsById = async (recordId) => {
+  try {
+    const [appointments] = await promisePool.query(
+      `
+        SELECT 
+            h.*, 
+            u1.nome AS paciente, 
+            u2.nome AS psicologo,
+            a.data AS dia
+        FROM 
+            horario h
+            INNER JOIN usuario u1 ON h.idUser = u1.idUser
+            INNER JOIN usuario u2 ON h.idPsico = u2.idUser
+            INNER JOIN agenda a ON h.idAgenda = a.idAgenda 
+        WHERE
+            h.idHorario = ?;
+        `, [recordId]
+    );
 
-        if (result.affectedRows > 0) {
-            return {
-                success: true,
-                message: "Consulta excluída com sucesso!",
-            };
-        } else {
-            throw new Error("Falha ao excluir a consulta.");
-        }
-    } catch (error) {
-        throw new Error(error.message);
+    if (!Array.isArray(appointments) || appointments.length === 0) {
+      return { success: false, message: "Nenhuma consulta encontrada" };
     }
+
+    return { success: true, data: appointments };
+  } catch (error) {
+    console.error("Erro ao buscar consultas: ", error);
+    return {
+      success: false,
+      message: "Erro ao buscar consultas",
+      details: error.message,
+    };
+  }
+};
+
+const deleteAppointment = async (idHorario) => {
+  try {
+    const [result] = await promisePool.query(
+      `UPDATE horario SET status = 'Cancelada' WHERE idHorario = ?`,
+      [idHorario]
+    );
+
+    if (result.affectedRows > 0) {
+      return {
+        success: true,
+        message: "Consulta excluída com sucesso!",
+      };
+    } else {
+      throw new Error("Falha ao excluir a consulta.");
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 module.exports = {
   registerAgenda,
   registerHours,
   getAppointments,
+  getAppointmentsById,
   deleteAppointment
 };
