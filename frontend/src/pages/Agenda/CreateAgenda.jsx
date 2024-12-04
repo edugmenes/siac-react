@@ -225,13 +225,19 @@ const CreateAgenda = () => {
               <Row>
                 <Col>
                   <Button
+                    size="large"
                     type="link"
+                    style={{ marginRight: "10px" }}
                     icon={<PlusOutlined style={{ fontSize: "16px" }} />}
                     onClick={handleSubmit}
                   >
                     Adicionar
                   </Button>
-                  <Button type="primary" onClick={handleSaveAgenda}>
+                  <Button
+                    size="large"
+                    type="primary"
+                    onClick={handleSaveAgenda}
+                  >
                     Salvar Agenda
                   </Button>
                 </Col>

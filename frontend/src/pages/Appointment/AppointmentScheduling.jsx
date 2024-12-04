@@ -201,7 +201,7 @@ const AppointmentScheduling = () => {
                 size="large"
                 htmlType="submit"
                 type="primary"
-                style={{ marginTop: "30px" }}
+                style={{ marginRight: "10px" }}
               >
                 Agendar consulta
               </Button>
