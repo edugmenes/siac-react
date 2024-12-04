@@ -91,9 +91,34 @@ const deleteAppointment = async (idHorario) => {
   }
 };
 
+const updateAppointment = async (recordId, formValues, authToken) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/rescheduling/${recordId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formValues),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao atualizar consulta:', error);
+    throw error;
+  }
+};
+
+
 
 module.exports = {
   apiAppointmentScheduling,
+  updateAppointment,
   getAppointments,
   getAppointmentById,
   deleteAppointment

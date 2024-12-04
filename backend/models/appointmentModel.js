@@ -1,5 +1,10 @@
 const promisePool = require("../config/databaseConfig");
 
+// const getAvailableAgendas = async (formValues) => {
+//   const ( )
+
+// }
+
 const registerAgenda = async (formValues) => {
   const { date, dayOfWeek, professional, initialTime, endTime } = formValues;
 
@@ -48,6 +53,58 @@ const registerHours = async (formValues, idUser, idAgenda) => {
     return {
       success: false,
       message: "Erro ao cadastrar horários:",
+      details: error.message,
+    };
+  }
+};
+
+const registerAgendaHours = async (formValues, idUser, idAgenda) => {
+  const { professional, initialTime, finalTime, breakStart, breakEnd } = formValues;
+  const patient = idUser;
+  const agenda = idAgenda;
+
+  try {
+    // Converte horários para objetos Date para facilitar os cálculos
+    const startTime = new Date(`1970-01-01T${initialTime}:00`);
+    const endTime = new Date(`1970-01-01T${finalTime}:00`);
+    const lunchStart = new Date(`1970-01-01T${breakStart}:00`);
+    const lunchEnd = new Date(`1970-01-01T${breakEnd}:00`);
+
+    const horarios = []; // Lista para armazenar os horários a serem inseridos
+    let currentTime = startTime;
+
+    while (currentTime < endTime) {
+
+      // Ignorar horários no intervalo de almoço
+      if (currentTime >= lunchStart && currentTime < lunchEnd) {
+        currentTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // Pula uma hora
+        continue;
+      }
+
+      horarios.push(currentTime.toTimeString().slice(0, 5)); // Formata para "HH:MM"
+      currentTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // Adiciona 1 hora
+    }
+
+    // Prepara os valores para inserir na tabela horario
+    const insertPromises = horarios.map(async (hora) => {
+      return promisePool.query(
+        `INSERT INTO horario (hora, idUser, disponibilidade, idAgenda, idPsico, status) VALUES (?, ?, ?, ?, ?, ?)`,
+        [hora, null, 0, agenda, professional, "Disponível"]
+      );
+    });
+
+    // Executa todas as inserções em paralelo
+    await Promise.all(insertPromises);
+
+    return {
+      success: true,
+      message: "Horários criados com sucesso!",
+    };
+  } catch (error) {
+    console.error("Erro ao cadastrar horários:", error);
+    return {
+      success: false,
+      message: "Erro ao cadastrar horários",
       details: error.message,
     };
   }

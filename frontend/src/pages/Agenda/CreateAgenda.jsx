@@ -144,6 +144,7 @@ const CreateAgenda = () => {
     },
     {
       title: "Ações",
+      align: "center",
       key: "actions",
       render: (_, record) => (
         <Button size="small" type="link" onClick={() => handleDelete(record)}>
@@ -170,33 +171,39 @@ const CreateAgenda = () => {
                   Inserir conjunto de datas
                 </Checkbox>
               </Form.Item>
-              <Form.Item
-                label="Data Inicial"
-                required
-                rules={[{ required: true, message: "Selecione uma data" }]}
-              >
-                <DatePicker
-                  onChange={handleDateChange}
-                  format="DD/MM/YYYY"
-                  style={{ width: "100%" }}
-                  size="large"
-                  disabledDate={(current) =>
-                    current && current < dayjs().startOf("day")
-                  }
-                />
-              </Form.Item>
-              <Form.Item label="Data Final">
-                <DatePicker
-                  onChange={handleFinalDateChange}
-                  format="DD/MM/YYYY"
-                  style={{ width: "100%" }}
-                  size="large"
-                  disabled={!enableFinalDate}
-                  disabledDate={(current) =>
-                    current && current <= dayjs(selectedDate).startOf("day")
-                  }
-                />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Data Inicial"
+                    required
+                    rules={[{ required: true, message: "Selecione uma data" }]}
+                  >
+                    <DatePicker
+                      onChange={handleDateChange}
+                      format="DD/MM/YYYY"
+                      style={{ width: "100%" }}
+                      size="large"
+                      disabledDate={(current) =>
+                        current && current < dayjs().startOf("day")
+                      }
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item label="Data Final">
+                    <DatePicker
+                      onChange={handleFinalDateChange}
+                      format="DD/MM/YYYY"
+                      style={{ width: "100%" }}
+                      size="large"
+                      disabled={!enableFinalDate}
+                      disabledDate={(current) =>
+                        current && current <= dayjs(selectedDate).startOf("day")
+                      }
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label="Hora de Início" required>

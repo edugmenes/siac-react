@@ -71,6 +71,46 @@ const appointmentScheduling = async (request, response) => {
     }
 };
 
+const appointmentRescheduling = async (request, response) => {
+    const { date, professional, time } = request.body;
+    const idUser = request.user.idUser;
+
+    console.log("Chegou na controller");
+    console.log(request.body);
+    try {
+        // Formatar a data e calcular a hora de término
+        const formattedDate = formatDate(date);
+        const dayOfWeek = getDayOfWeek(date);
+        const endTime = calculateEndTime(time);
+
+        // Registrar a agenda e capturar o idAgenda
+        const agendaResult = await appointmentModel.registerAgenda({
+            date: formattedDate,
+            dayOfWeek: dayOfWeek,
+            professional,
+            initialTime: time,
+            endTime: endTime
+        });
+
+        if (!agendaResult.success) {
+            return response.status(400).json({ message: agendaResult.message, formValues: agendaResult.formValues });
+        }
+
+        const { idAgenda } = agendaResult.data; // Captura o id da agenda criada
+
+        // Registrar o horário com o idAgenda
+        const horarioResult = await appointmentModel.registerHours({ professional, initialTime: time }, idUser, idAgenda);
+
+        if (horarioResult.success) {
+            return response.status(201).json({ message: horarioResult.message, data: horarioResult.data });
+        } else {
+            return response.status(400).json({ message: horarioResult.message });
+        }
+    } catch (error) {
+        return response.status(500).json({ message: error.message });
+    }
+};
+
 const getAppointments = async (request, response) => {
     //console.log('Chegou na controller para getAppointments');
     try {
@@ -148,6 +188,7 @@ const deleteAppointment = async (request, response) => {
 
 module.exports = {
     appointmentScheduling,
+    appointmentRescheduling,
     agendaCreation,
     getAppointments,
     getAppointmentsById,

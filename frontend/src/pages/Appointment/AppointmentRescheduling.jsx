@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { getUsersByRole } from "../../api/user";
-import { getAppointmentById } from "../../api/appointment";
+import { getAppointmentById, updateAppointment } from "../../api/appointment";
 
 const AppointmentRescheduling = () => {
   const { recordId } = useParams();
@@ -64,21 +64,29 @@ const AppointmentRescheduling = () => {
   }, [recordId, form]);
 
   const handleSubmit = async (values) => {
-    try {
-      const formattedValues = {
-        ...values,
-        date: values.date.format("YYYY-MM-DD"),
-        time: values.time.format("HH:mm"),
-      };
+    const formattedValues = {
+      ...values,
+      date: values.date.format("YYYY-MM-DD"),
+      time: values.time.format("HH:mm"),
+    };
 
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+      console.error("Token não encontrado no localStorage");
+      return;
+    }
+
+    try {
+      await updateAppointment(recordId, formattedValues, authToken);
       notification.success({
         message: "Sucesso",
-        description: "Consulta remarcada com sucesso!",
+        description: "Consulta agendada com sucesso!",
       });
     } catch (error) {
       notification.error({
         message: "Erro",
-        description: `Falha ao remarcar consulta: ${error.message}`,
+        description: `Falha no agendamento: ${error.message}`,
       });
     }
   };

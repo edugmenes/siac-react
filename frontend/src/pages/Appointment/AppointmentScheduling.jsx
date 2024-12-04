@@ -16,6 +16,7 @@ import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { getUsersByRole } from "../../api/user";
 import { apiAppointmentScheduling } from "../../api/appointment";
+import { fetchAvailableAgenda } from "../../api/agenda";
 
 const AppointmentScheduling = () => {
   const [selectedDate, setSelectedDate] = useState(null);
