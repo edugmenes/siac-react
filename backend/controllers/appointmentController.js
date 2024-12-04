@@ -10,9 +10,9 @@ const agendaCreation = async (request, response) => {
     }
 
     try {
-        // Executa todas as operações de criação de agenda em paralelo e coleta as mensagens
-        const agendaResults = await Promise.all(
-            agendas.map(async ({ data, horaInicio, horaFim, diaSemana }) => {
+        // Executa todas as operações de criação de agenda em paralelo
+        const agendaResult = await Promise.all(
+            formattedAgendaIntervals.map(async ({ data, horaInicio, horaFim, diaSemana, intervalos }) => {
                 const formattedDate = formatDate(data);
                 const result = await appointmentModel.registerAgenda({
                     date: formattedDate,
