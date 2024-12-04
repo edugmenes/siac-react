@@ -33,14 +33,14 @@ const registerAgenda = async (formValues) => {
 };
 
 const registerHours = async (formValues, idUser, idAgenda) => {
-  const { professional, initialTime } = formValues;
+  const { professional, initialTime, disponibilidade, status } = formValues;
   const patient = idUser;
   const agenda = idAgenda;
 
   try {
     const [result] = await promisePool.query(
       `INSERT INTO horario (hora, idUser, disponibilidade, idAgenda, idPsico, status) VALUES (?, ?, ?, ?, ?, ?)`,
-      [initialTime, patient, 1, agenda, professional, 'Agendada']
+      [initialTime, patient, disponibilidade, agenda, professional, status]
     );
 
     return {

@@ -1,4 +1,9 @@
-const { formatDate, getDayOfWeek } = require('../middleware/dateTimeFunctions');
+const {
+    formatDate,
+    getDayOfWeek,
+    calculateEndTime,
+    calculateTimeIntervals
+} = require('../middleware/dateTimeFunctions');
 const appointmentModel = require('../models/appointmentModel');
 
 const agendaCreation = async (request, response) => {
@@ -9,32 +14,56 @@ const agendaCreation = async (request, response) => {
         return response.status(400).json({ message: 'Nenhuma agenda foi adicionada.' });
     }
 
-    try {
-        // Executa todas as operações de criação de agenda em paralelo
-        const agendaResult = await Promise.all(
-            formattedAgendaIntervals.map(async ({ data, horaInicio, horaFim, diaSemana, intervalos }) => {
-                const formattedDate = formatDate(data);
-                const result = await appointmentModel.registerAgenda({
-                    date: formattedDate,
-                    dayOfWeek: diaSemana,
-                    professional: idUser,
-                    initialTime: horaInicio,
-                    endTime: horaFim
-                });
-                return result.message; // Coleta a mensagem de cada registro
-            })
-        );
+    const formattedAgendaIntervals = calculateTimeIntervals(agendas);
 
-        return response.status(201).json({
-            messages: agendaResults // Inclui todas as mensagens no campo 'messages'
-        });
+    try {
+        // Iterar sobre cada agenda no array formattedAgendaIntervals
+        for (const agenda of formattedAgendaIntervals) {
+            const { data, horaInicio, horaFim, diaSemana, intervalos } = agenda;
+
+            // Registrar a agenda e capturar o idAgenda
+            const formattedDate = formatDate(data);
+            const agendaResult = await appointmentModel.registerAgenda({
+                date: formattedDate,
+                dayOfWeek: diaSemana,
+                professional: idUser,
+                initialTime: horaInicio,
+                endTime: horaFim
+            });
+
+            if (!agendaResult.success) {
+                throw new Error(`Erro ao registrar agenda: ${agendaResult.message}`);
+            }
+
+            const { idAgenda } = agendaResult.data; // Captura o ID da agenda registrada
+
+            // Iterar sobre os horários e registrar cada um associado à agenda
+            for (const time of intervalos) {
+                const horarioResult = await appointmentModel.registerHours({
+                    professional: idUser,
+                    initialTime: time,
+                    disponibilidade: 0,
+                    status: 'Disponível'
+                }, idUser, idAgenda);
+
+                if (!horarioResult.success) {
+                    throw new Error(`Erro ao registrar horário: ${horarioResult.message}`);
+                }
+            }
+        }
+
+        // Retornar sucesso se todas as operações forem concluídas
+        return response.status(201).json({ message: 'Agendas e horários criados com sucesso!' });
     } catch (error) {
+        // Retornar erro caso qualquer etapa falhe
         return response.status(500).json({ message: error.message });
     }
 };
 
 const appointmentScheduling = async (request, response) => {
     const { date, professional, time } = request.body;
+    const disponibilidade = 1;
+    const status = 'Agendada';
     const idUser = request.user.idUser;
 
     try {
@@ -59,7 +88,12 @@ const appointmentScheduling = async (request, response) => {
         const { idAgenda } = agendaResult.data; // Captura o id da agenda criada
 
         // Registrar o horário com o idAgenda
-        const horarioResult = await appointmentModel.registerHours({ professional, initialTime: time }, idUser, idAgenda);
+        const horarioResult = await appointmentModel.registerHours({
+            professional,
+            initialTime: time,
+            disponibilidade,
+            status
+        }, idUser, idAgenda);
 
         if (horarioResult.success) {
             return response.status(201).json({ message: horarioResult.message, data: horarioResult.data });
@@ -74,6 +108,8 @@ const appointmentScheduling = async (request, response) => {
 const appointmentRescheduling = async (request, response) => {
     const { date, professional, time } = request.body;
     const idUser = request.user.idUser;
+    const disponibilidade = 1;
+    const status = 'Remarcada';
 
     console.log("Chegou na controller");
     console.log(request.body);
@@ -99,7 +135,12 @@ const appointmentRescheduling = async (request, response) => {
         const { idAgenda } = agendaResult.data; // Captura o id da agenda criada
 
         // Registrar o horário com o idAgenda
-        const horarioResult = await appointmentModel.registerHours({ professional, initialTime: time }, idUser, idAgenda);
+        const horarioResult = await appointmentModel.registerHours({
+            professional,
+            initialTime: time,
+            disponibilidade,
+            status
+        }, idUser, idAgenda);
 
         if (horarioResult.success) {
             return response.status(201).json({ message: horarioResult.message, data: horarioResult.data });
@@ -112,19 +153,14 @@ const appointmentRescheduling = async (request, response) => {
 };
 
 const getAppointments = async (request, response) => {
-    //console.log('Chegou na controller para getAppointments');
     try {
-        // Chame o método do modelo e verifique o retorno
         const appointments = await appointmentModel.getAppointments();
-        //console.log('Resultado da model que bateu na controller getAppointments:', appointments);
 
-        // Verifique se o dado é válido e não está vazio
         if (!appointments || appointments.length === 0) {
             console.log('No appointments found.');
             return response.status(404).json({ message: 'Nenhuma consulta encontrada' });
         }
 
-        // Se houver dados, envie a resposta com status 200
         response.status(200).json(appointments);
     } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -139,16 +175,13 @@ const getAppointmentsById = async (request, response) => {
     const { recordId } = request.params;
 
     try {
-        // Chame o método do modelo e verifique o retorno
         const appointments = await appointmentModel.getAppointmentsById(recordId);
 
-        // Verifique se o dado é válido e não está vazio
         if (!appointments || appointments.length === 0) {
             console.log('No appointments found.');
             return response.status(404).json({ message: 'Nenhuma consulta encontrada' });
         }
 
-        // Se houver dados, envie a resposta com status 200
         response.status(200).json(appointments);
     } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -157,18 +190,6 @@ const getAppointmentsById = async (request, response) => {
             details: error.message,
         });
     }
-};
-
-// Função para calcular a hora de término
-const calculateEndTime = (time) => {
-    const [hours, minutes] = time.split(':').map(Number); // Divide a hora e os minutos
-    const endTime = new Date();
-
-    endTime.setHours(hours);
-    endTime.setMinutes(minutes + 50); // Adiciona 50 minutos
-
-    // Formata a hora final como "HH:mm"
-    return endTime.toTimeString().slice(0, 5);
 };
 
 const deleteAppointment = async (request, response) => {
