@@ -19,6 +19,7 @@ const PatientRecordsList = () => {
     try {
       const response = await getPatientRecords();
       setRecords(response.prontuarios);
+      console.log('rea', response.prontuarios)
     } catch (error) {
       console.error("Erro ao buscar os prontuarios: ", error);
     } finally {
@@ -45,6 +46,23 @@ const PatientRecordsList = () => {
       title: "Observações",
       dataIndex: "observations",
       key: "observations",
+      render: (observations) => {
+        if (!observations) return "Sem observações";
+        
+        const { sintomas, tratamento } = observations;
+    
+        return (
+          <div>
+            <strong>Sintomas:</strong>
+            <ul>
+              {sintomas?.map((sintoma, index) => (
+                <li key={index}>{sintoma}</li>
+              ))}
+            </ul>
+            <strong>Tratamento:</strong> {tratamento || "Não informado"}
+          </div>
+        );
+      },
     },
     {
       title: "Data",
