@@ -15,18 +15,19 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import {
-  apiAppointmentScheduling,
   getDatesAvailableToScheduling,
+  getProfessionalsForDate,
   getAvailableHoursToScheduling,
+  apiAppointmentScheduling,
 } from "../../api/appointment";
 
 const AppointmentScheduling = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [availableDates, setAvailableDates] = useState([]);
   const [availableProfessionals, setAvailableProfessionals] = useState([]);
   const [availableHours, setAvailableHours] = useState([]);
-  const [selectedTimeId, setSelectedTimeId] = useState(null); // Guarda o id do horário selecionado
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedProfessional, setSelectedProfessional] = useState(null);
+  const [selectedTimeId, setSelectedTimeId] = useState(null);
   const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
@@ -39,13 +40,13 @@ const AppointmentScheduling = () => {
     );
     setRooms(mockRooms);
 
-    // Requisição para obter as datas disponíveis
+    // Fetch dates from API
     const fetchAvailableDates = async () => {
       try {
         const data = await getDatesAvailableToScheduling();
-
         if (data.success) {
           setAvailableDates(data.data);
+          console.log("Datas disponíveis:", data.data);
         } else {
           notification.error({
             message: "Erro",
@@ -56,72 +57,105 @@ const AppointmentScheduling = () => {
         console.error("Erro ao buscar datas disponíveis:", error);
       }
     };
-
     fetchAvailableDates();
   }, []);
 
-  const handleDateChange = (value) => {
+  const handleDateChange = async (value) => {
+    if (!value) {
+      resetFields();
+      return;
+    }
+
     setSelectedDate(value);
+    setAvailableProfessionals([]);
+    setSelectedProfessional(null);
+    setAvailableHours([]);
+    setSelectedTimeId(null);
 
-    // Filtra os profissionais disponíveis para a data selecionada
-    const selectedDateString = value.format("YYYY-MM-DD");
-    const filteredProfessionals = availableDates
-      .filter(
+    try {
+      // Filtra as agendas que correspondem à data selecionada
+      const selectedDateString = value.format("YYYY-MM-DD");
+      const selectedAgendas = availableDates.filter(
         (item) => dayjs(item.data).format("YYYY-MM-DD") === selectedDateString
-      )
-      .map((item) => ({
-        label: item.nome,
-        value: item.idPsico,
-      }));
+      );
 
-    setAvailableProfessionals(filteredProfessionals); // Atualiza os profissionais disponíveis
-  };
+      // Coleta os idAgenda
+      const idAgendas = selectedAgendas.map((agenda) => agenda.idAgenda);
+      console.log("Agendas encontradas na data:", idAgendas);
 
-  const handleProfessionalChange = async (value) => {
-    setSelectedProfessional(value);
+      // Faz a requisição passando a lista de idAgenda
+      const response = await getProfessionalsForDate(idAgendas);
+      if (response.success) {
+        const professionals = response.data.map((prof) => ({
+          label: prof.nome,
+          value: prof.idPsico,
+          idAgenda: prof.idAgenda,
+        }));
 
-    // Obter os horários disponíveis para o profissional selecionado
-    const selectedProfessionalData = availableDates.filter(
-      (item) => item.idPsico === value
-    );
-
-    if (selectedProfessionalData.length > 0) {
-      const idAgenda = selectedProfessionalData[0].idAgenda;
-
-      try {
-        const response = await getAvailableHoursToScheduling(idAgenda);
-        if (response.success) {
-          const formattedHours = response.data.map((item) => {
-            const hour = dayjs(item.hora, "HH:mm:ss").format("HH:mm"); // Formata para HH:mm
-            return {
-              label: hour,
-              value: hour,
-              idHorario: item.idHorario, // Aqui passamos o idHorario
-            };
-          });
-          setAvailableHours(formattedHours); // Atualiza os horários disponíveis
-        } else {
-          notification.error({
-            message: "Erro",
-            description: response.message,
-          });
-        }
-      } catch (error) {
-        console.error("Erro ao buscar horários disponíveis:", error);
+        console.log("Profissionais encontrados na data:", professionals);
+        setAvailableProfessionals(professionals);
+      } else {
+        notification.error({
+          message: "Erro",
+          description: response.message,
+        });
       }
+    } catch (error) {
+      console.error("Erro ao buscar profissionais disponíveis:", error);
     }
   };
 
-  const handleTimeChange = (value, option) => {
-    setSelectedTimeId(option.idHorario); // Armazena o idHorario do horário selecionado
+  const handleProfessionalChange = async (value) => {
+    if (!value) {
+      setSelectedProfessional(null);
+      setAvailableHours([]);
+      setSelectedTimeId(null);
+      return;
+    }
+
+    setSelectedProfessional(value);
+    setAvailableHours([]);
+    setSelectedTimeId(null);
+
+    // Encontrar o profissional selecionado e obter o idAgenda
+    const selectedProfessionalData = availableProfessionals.find(
+      (prof) => prof.value === value // Comparar idPsico
+    );
+    console.log("Profissional escolhido: ", selectedProfessionalData);
+
+    // Passar apenas o idAgenda para a API
+    const { idAgenda } = selectedProfessionalData;
+
+    try {
+      const response = await getAvailableHoursToScheduling(idAgenda);
+      if (response.success) {
+        const hours = response.data.map((hour) => ({
+          label: dayjs(hour.hora, "HH:mm:ss").format("HH:mm"),
+          value: hour.idHorario,
+        }));
+
+        console.log("Horários disponíveis: ", hours);
+        setAvailableHours(hours);
+      } else {
+        notification.error({
+          message: "Erro",
+          description: response.message,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar horários disponíveis:", error);
+    }
+  };
+
+  const handleTimeChange = (value) => {
+    setSelectedTimeId(value || null);
   };
 
   const handleSubmit = async (values) => {
     const formattedValues = {
-      ...values,
-      date: values.date ? dayjs(values.date).format("DD/MM/YYYY") : null,
-      time: values.time,
-      idHorario: selectedTimeId,
+      date: selectedDate.format("YYYY-MM-DD"),
+      professional: selectedProfessional,
+      timeId: selectedTimeId,
     };
 
     const authToken = localStorage.getItem("authToken");
@@ -136,6 +170,7 @@ const AppointmentScheduling = () => {
         message: "Sucesso",
         description: "Consulta agendada com sucesso!",
       });
+      resetFields();
     } catch (error) {
       notification.error({
         message: "Erro",
@@ -144,8 +179,15 @@ const AppointmentScheduling = () => {
     }
   };
 
+  const resetFields = () => {
+    setSelectedDate(null);
+    setSelectedProfessional(null);
+    setSelectedTimeId(null);
+    setAvailableProfessionals([]);
+    setAvailableHours([]);
+  };
+
   const disabledDate = (current) => {
-    // Desabilita datas que não estão na lista de datas disponíveis
     return (
       current &&
       !availableDates.some((date) => dayjs(date.data).isSame(current, "day"))
@@ -173,6 +215,7 @@ const AppointmentScheduling = () => {
                   size="large"
                   placeholder="Selecione o dia"
                   disabledDate={disabledDate}
+                  allowClear
                 />
               </Form.Item>
             </Col>
@@ -191,6 +234,7 @@ const AppointmentScheduling = () => {
                   placeholder="Selecione o profissional"
                   options={availableProfessionals}
                   disabled={!selectedDate}
+                  allowClear
                 />
               </Form.Item>
             </Col>
@@ -206,13 +250,10 @@ const AppointmentScheduling = () => {
                   style={{ width: "100%" }}
                   size="large"
                   placeholder="Selecione o horário"
-                  options={availableHours.map((hora) => ({
-                    label: hora.label,
-                    value: hora.value,
-                    idHorario: hora.idHorario, // Passa o idHorario na opção
-                  }))}
-                  onChange={handleTimeChange} // Chama a função para capturar o idHorario
-                  disabled={!selectedDate || !selectedProfessional}
+                  options={availableHours}
+                  onChange={handleTimeChange}
+                  disabled={!selectedProfessional}
+                  allowClear
                 />
               </Form.Item>
             </Col>
@@ -228,6 +269,7 @@ const AppointmentScheduling = () => {
                   placeholder="Selecione a sala"
                   options={rooms}
                   disabled={!selectedDate || !selectedProfessional}
+                  allowClear
                 />
               </Form.Item>
             </Col>

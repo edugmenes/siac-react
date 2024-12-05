@@ -77,7 +77,7 @@ const Appointment = () => {
       title: "Data",
       dataIndex: "dia",
       key: "dia",
-      width: 180,
+      // width: 180,
       render: (text) =>
         new Date(text).toLocaleDateString("pt-BR", {
           year: "numeric",
@@ -89,7 +89,7 @@ const Appointment = () => {
       title: "Horário",
       dataIndex: "hora",
       key: "hora",
-      width: 160,
+      // width: 160,
     },
     {
       title: "Profissional",
@@ -132,7 +132,7 @@ const Appointment = () => {
       title: "Ações",
       key: "actions",
       align: "center",
-      width: 160,
+      // width: 160,
       render: (_, record) => (
         <>
           <Button

@@ -44,31 +44,31 @@ const UsersList = () => {
       title: "Nome",
       dataIndex: "nome",
       key: "nome",
-      width: 220,
+      // width: 220,
     },
     {
       title: "E-Mail",
       dataIndex: "email",
       key: "email",
-      width: 300,
+      // width: 300,
     },
     {
       title: "Celular",
       dataIndex: "celular",
       key: "celular",
-      width: 200,
+      // width: 200,
     },
     {
       title: "Perfil",
       dataIndex: "perfil",
       key: "perfil",
-      width: 195,
+      // width: 195,
     },
     {
       title: "Ações",
       key: "actions",
       render: (text, record) => (
-        <Space size="middle">
+        <Space size="large">
           <Button onClick={() => handleEdit(record)} type="link">
             <EditOutlined />
           </Button>

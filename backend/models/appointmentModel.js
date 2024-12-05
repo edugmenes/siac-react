@@ -153,6 +153,40 @@ const getAgendaAvailableHours = async (idAgenda) => {
   }
 };
 
+const getAgendaAvailablePsicos = async (idAgendas) => {
+  try {
+    // Executando a consulta no banco de dados
+    const [psicos] = await promisePool.query(
+      `
+        SELECT DISTINCT
+            h.idAgenda, h.idPsico, u.nome
+        FROM 
+            horario h
+        INNER JOIN 
+            usuario u
+        ON
+            h.idPsico = u.idUser
+        WHERE 
+            h.idAgenda IN (?) 
+      `, [idAgendas]
+    );
+
+    if (!Array.isArray(psicos) || psicos.length === 0) {
+      return { success: false, message: "Nenhum profissional encontrado para as agendas fornecidas." };
+    }
+
+    return { success: true, data: psicos, message: "Profissionais encontrados com sucesso." };
+  } catch (error) {
+    console.error("Erro ao buscar profissionais: ", error);
+
+    return {
+      success: false,
+      message: "Erro ao buscar profissionais.",
+      details: error.message,
+    };
+  }
+};
+
 const getAppointments = async () => {
   try {
     const [appointments] = await promisePool.query(
@@ -249,5 +283,6 @@ module.exports = {
   getAppointmentsById,
   deleteAppointment,
   getAppointmentDatesAvailable,
-  getAgendaAvailableHours
+  getAgendaAvailableHours,
+  getAgendaAvailablePsicos
 };
