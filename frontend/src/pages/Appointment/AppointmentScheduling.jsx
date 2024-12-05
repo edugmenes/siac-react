@@ -14,52 +14,150 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
-import { getUsersByRole } from "../../api/authentication";
-import { apiAppointmentScheduling } from "../../api/appointment";
+import { useNavigate } from "react-router-dom"; // Mover para o topo, onde os hooks são definidos
+import {
+  getDatesAvailableToScheduling,
+  getProfessionalsForDate,
+  getAvailableHoursToScheduling,
+  apiAppointmentScheduling,
+} from "../../api/appointment";
 
 const AppointmentScheduling = () => {
+  const navigate = useNavigate(); // Use o hook aqui no topo do componente
+  const [availableDates, setAvailableDates] = useState([]);
+  const [availableProfessionals, setAvailableProfessionals] = useState([]);
+  const [availableHours, setAvailableHours] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedProfessional, setSelectedProfessional] = useState(null);
+  const [selectedTimeId, setSelectedTimeId] = useState(null);
+  const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    // Mock para as salas
+    const mockRooms = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"].map(
+      (room) => ({
+        label: room,
+        value: room,
+      })
+    );
+    setRooms(mockRooms);
+
+    // Fetch dates from API
+    const fetchAvailableDates = async () => {
       try {
-        const response = await getUsersByRole(5);
-        const doctorsToDropdown = response.data.map((d) => ({
-          label: d.nome,
-          value: d.idUser,
-        }));
-        setDoctors(doctorsToDropdown);
+        const data = await getDatesAvailableToScheduling();
+        if (data.success) {
+          setAvailableDates(data.data);
+        } else {
+          notification.error({
+            message: "Erro",
+            description: data.message,
+          });
+        }
       } catch (error) {
-        console.error("Erro ao buscar psicólogos:", error);
-      } finally {
-        setLoading(false);
+        console.error("Erro ao buscar datas disponíveis:", error);
       }
     };
 
-    fetchDoctors();
+    fetchAvailableDates();
   }, []);
 
-  const handleDateChange = (value, dateString) => {
+  const handleDateChange = async (value) => {
+    if (!value) {
+      resetFields();
+      return;
+    }
+
     setSelectedDate(value);
+    setAvailableProfessionals([]);
+    setSelectedProfessional(null);
+    setAvailableHours([]);
+    setSelectedTimeId(null);
+    console.log("Datas disponíveis: ", availableDates);
+
+    try {
+      const selectedDateString = value.format("YYYY-MM-DD");
+      console.log("Data selecionada: ", selectedDateString);
+
+      const selectedAgendas = availableDates.filter(
+        (item) => dayjs(item.data).format("YYYY-MM-DD") === selectedDateString
+      );
+
+      const idAgendas = selectedAgendas.map((agenda) => agenda.idAgenda);
+      console.log("Agendas encontradas na data:", idAgendas);
+
+      const response = await getProfessionalsForDate(idAgendas);
+      if (response.success) {
+        const professionals = response.data.map((prof) => ({
+          label: prof.nome,
+          value: prof.idPsico,
+          idAgenda: prof.idAgenda,
+        }));
+
+        console.log("Profissionais encontrados na data:", professionals);
+        setAvailableProfessionals(professionals);
+      } else {
+        notification.error({
+          message: "Erro",
+          description: response.message,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar profissionais disponíveis:", error);
+    }
   };
 
-  const handleTimeChange = (value, dateString) => {
-    setSelectedTime(value);
-    console.log("Data e hora selecionadas:", value, dateString);
+  const handleProfessionalChange = async (value) => {
+    if (!value) {
+      setSelectedProfessional(null);
+      setAvailableHours([]);
+      setSelectedTimeId(null);
+      return;
+    }
+
+    setSelectedProfessional(value);
+    setAvailableHours([]);
+    setSelectedTimeId(null);
+
+    const selectedProfessionalData = availableProfessionals.find(
+      (prof) => prof.value === value
+    );
+    console.log("Profissional escolhido: ", selectedProfessionalData);
+
+    const { idAgenda } = selectedProfessionalData;
+
+    try {
+      const response = await getAvailableHoursToScheduling(idAgenda);
+      if (response.success) {
+        const hours = response.data.map((hour) => ({
+          label: dayjs(hour.hora, "HH:mm:ss").format("HH:mm"),
+          value: hour.idHorario,
+        }));
+
+        console.log("Horários disponíveis: ", hours);
+        setAvailableHours(hours);
+      } else {
+        notification.error({
+          message: "Erro",
+          description: response.message,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar horários disponíveis:", error);
+    }
   };
 
-  const handleProfessionalChange = (value) => {
-    console.log(value);
+  const handleTimeChange = (value) => {
+    setSelectedTimeId(value || null);
   };
 
   const handleSubmit = async (values) => {
+    console.log("Valores submetidos: ", values);
     const formattedValues = {
-      ...values,
-      date: values.date ? dayjs(values.date).format("DD/MM/YYYY") : null,
-      time: values.time ? dayjs(values.time).format("HH:mm") : null,
+      date: selectedDate.format("YYYY-MM-DD"),
+      professional: selectedProfessional,
+      timeId: selectedTimeId,
+      room: values.room,
     };
 
     const authToken = localStorage.getItem("authToken");
@@ -72,8 +170,11 @@ const AppointmentScheduling = () => {
       await apiAppointmentScheduling(formattedValues, authToken);
       notification.success({
         message: "Sucesso",
-        description: "Consultas agendada com sucesso!",
+        description: "Consulta agendada com sucesso!",
       });
+
+      // Redirecionar para a página /appointments
+      navigate("/appointments"); // Agora está dentro do componente, como deve ser
     } catch (error) {
       notification.error({
         message: "Erro",
@@ -82,114 +183,116 @@ const AppointmentScheduling = () => {
     }
   };
 
-  const disabledHours = () => {
-    const hours = [];
-    for (let i = 0; i < 24; i++) {
-      if (i < 7 || i >= 19) {
-        hours.push(i);
-      }
-    }
-    return hours;
-  };
-
-  const disabledMinutes = (selectedHour) => {
-    const minutes = [];
-    for (let i = 0; i < 60; i++) {
-      if (i % 15 !== 0) {
-        minutes.push(i);
-      }
-    }
-    return minutes;
+  const resetFields = () => {
+    setSelectedDate(null);
+    setSelectedProfessional(null);
+    setSelectedTimeId(null);
+    setAvailableProfessionals([]);
+    setAvailableHours([]);
   };
 
   const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+    return (
+      current &&
+      !availableDates.some((date) => dayjs(date.data).isSame(current, "day"))
+    );
   };
 
   return (
     <>
       <Typography.Title level={2} style={{ marginBottom: "40px" }}>
-        Agendamento de Consulta
+        Agendar Consulta
       </Typography.Title>
       <Form layout="vertical" onFinish={handleSubmit}>
         <ConfigProvider locale={ptBR}>
-          <div>
-            <Row>
-              <Col span={6}>
-                <Form.Item
-                  label="Selecione a data:"
-                  name="date"
-                  rules={[{ required: true, message: "Selecione uma data" }]}
-                >
-                  <DatePicker
-                    onChange={handleDateChange}
-                    format="DD/MM/YYYY"
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="Selecione o dia"
-                    disabledDate={disabledDate}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <Form.Item
-                  label="Selecione o horário:"
-                  name="time"
-                  rules={[{ required: true, message: "Selecione um horário" }]}
-                >
-                  <DatePicker
-                    picker="time"
-                    onChange={handleTimeChange}
-                    showTime={{
-                      hideDisabledOptions: true,
-                      disabledHours,
-                      disabledMinutes,
-                    }}
-                    format="HH:mm"
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="Selecione a hora"
-                    disabled={!selectedDate}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <Form.Item
-                  label="Selecione o profissional:"
-                  name="professional"
-                  rules={[
-                    { required: true, message: "Selecione um profissional" },
-                  ]}
-                >
-                  <Select
-                    style={{ width: "100%" }}
-                    onChange={handleProfessionalChange}
-                    size="large"
-                    placeholder="Selecione o profissional"
-                    options={doctors}
-                    disabled={!selectedTime}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              <Col span={2}>
-                <Button
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione a data:"
+                name="date"
+                rules={[{ required: true, message: "Selecione uma data" }]}
+              >
+                <DatePicker
+                  onChange={handleDateChange}
+                  format="DD/MM/YYYY"
+                  style={{ width: "100%" }}
                   size="large"
-                  htmlType="submit"
-                  type="primary"
-                  style={{ marginTop: "30px" }}
-                >
-                  Agendar consulta
-                </Button>
-              </Col>
-            </Row>
-          </div>
+                  placeholder="Selecione o dia"
+                  disabledDate={disabledDate}
+                  allowClear
+                  onClear={() => setSelectedProfessional(null)}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione o profissional:"
+                name="professional"
+                rules={[
+                  { required: true, message: "Selecione um profissional" },
+                ]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  onChange={handleProfessionalChange}
+                  size="large"
+                  placeholder="Selecione o profissional"
+                  options={availableProfessionals}
+                  disabled={!selectedDate}
+                  allowClear
+                  onClear={() => setSelectedTimeId(null)}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione o horário:"
+                name="time"
+                rules={[{ required: true, message: "Selecione um horário" }]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  size="large"
+                  placeholder="Selecione o horário"
+                  options={availableHours}
+                  onChange={handleTimeChange}
+                  disabled={!selectedProfessional}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione a sala:"
+                name="room"
+                rules={[{ required: true, message: "Selecione uma sala" }]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  size="large"
+                  placeholder="Selecione a sala"
+                  options={rooms}
+                  disabled={!selectedDate || !selectedProfessional}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Divider />
+          <Row>
+            <Col span={2}>
+              <Button
+                size="large"
+                htmlType="submit"
+                type="primary"
+                style={{ marginRight: "10px" }}
+              >
+                Agendar consulta
+              </Button>
+            </Col>
+          </Row>
         </ConfigProvider>
       </Form>
     </>

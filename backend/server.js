@@ -5,6 +5,7 @@ const app = express();
 const userRoutes = require('./routes/userRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const agendaRoutes = require('./routes/agendaRoutes');
+const patientRecordsRoutes = require('./routes/patientRecordRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -41,6 +42,7 @@ app.use('/auth', userRoutes);
 app.use('/user', userRoutes);
 app.use('/appointment', appointmentRoutes);
 app.use('/agenda', agendaRoutes);
+app.use('/patient-records', patientRecordsRoutes)
 app.use('/report', reportRoutes);
 
 

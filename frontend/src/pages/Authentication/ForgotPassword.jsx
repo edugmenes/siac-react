@@ -46,8 +46,7 @@ const ForgotPasswordModal = ({ isVisible, handleCancel }) => {
             fontSize: "15px",
           }}
         >
-          Digite seu email e enviaremos um link com uma senha temporária para
-          você
+          Digite seu email que enviaremos uma nova senha para você
         </Text>
 
         <Form

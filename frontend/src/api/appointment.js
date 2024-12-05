@@ -1,10 +1,12 @@
-const backendUrl = "https://siac-api.ddns.net";
+//const backendUrl = "https://siac-api.ddns.net";
+const backendUrl = "http://localhost:5000";
 
-//debugger;
 const apiAppointmentScheduling = async (formValues, authToken) => {
+  console.log("Chegou na API: ", formValues);
+
   try {
     const response = await fetch(`${backendUrl}/appointment/scheduling`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Authorization': `Bearer ${authToken}`,
         'Content-Type': 'application/json',
@@ -25,7 +27,6 @@ const apiAppointmentScheduling = async (formValues, authToken) => {
 
 const getAppointments = async () => {
   try {
-    //console.log('Chegou na API')
     const url = `${backendUrl}/appointment/get`;
 
     const response = await fetch(url, {
@@ -49,6 +50,88 @@ const getAppointments = async () => {
   }
 };
 
+const getAppointmentById = async (recordId) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/${recordId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
+const getDatesAvailableToScheduling = async () => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/available/dates`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
+const getProfessionalsForDate = async (idAgendas) => {
+  const ids = idAgendas.join(',');
+
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/professionals?ids=${ids}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
+const getAvailableHoursToScheduling = async (idAgenda) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/hours/${idAgenda}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
 const deleteAppointment = async (idHorario) => {
   try {
     const response = await fetch(`${backendUrl}/appointment/delete`, {
@@ -56,7 +139,7 @@ const deleteAppointment = async (idHorario) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idHorario }), 
+      body: JSON.stringify({ idHorario }),
     });
 
     if (!response.ok) {
@@ -71,9 +154,38 @@ const deleteAppointment = async (idHorario) => {
   }
 };
 
+const updateAppointment = async (recordId, formValues, authToken) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/rescheduling/${recordId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formValues),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao atualizar consulta:', error);
+    throw error;
+  }
+};
+
+
 
 module.exports = {
   apiAppointmentScheduling,
+  updateAppointment,
   getAppointments,
-  deleteAppointment
+  getAppointmentById,
+  getProfessionalsForDate,
+  deleteAppointment,
+  getDatesAvailableToScheduling,
+  getAvailableHoursToScheduling
 };

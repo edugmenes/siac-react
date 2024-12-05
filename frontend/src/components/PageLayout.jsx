@@ -4,6 +4,7 @@ import { Link, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import {
   AppstoreOutlined,
+  CarryOutOutlined,
   DeleteOutlined,
   DownOutlined,
   EditOutlined,
@@ -33,7 +34,7 @@ const menuItems = [
   },
   {
     key: "3",
-    label: "Documentos",
+    label: "Prontuários",
     link: "/documents",
     icon: <FolderOutlined style={{ fontSize: "24px" }} />,
   },
@@ -43,23 +44,23 @@ const menuItems = [
     link: "/appointments",
     icon: <ScheduleOutlined style={{ fontSize: "24px" }} />,
   },
+  // {
+  //   key: "5",
+  //   label: "Lixeira",
+  //   link: "/bin",
+  //   icon: <DeleteOutlined style={{ fontSize: "24px" }} />,
+  // },
   {
-    key: "5",
-    label: "Lixeira",
-    link: "/bin",
-    icon: <DeleteOutlined style={{ fontSize: "24px" }} />,
+    key: "6",
+    label: "Agenda",
+    link: "/agenda/create-agenda",
+    icon: <CarryOutOutlined style={{ fontSize: "24px" }} />,
   },
   {
     key: "7",
     label: "Usuários",
     link: "/users",
     icon: <UserOutlined style={{ fontSize: "24px" }} />,
-  },
-  {
-    key: "6",
-    label: "Configurações",
-    link: "/settings",
-    icon: <SettingOutlined style={{ fontSize: "24px" }} />,
   },
 ];
 

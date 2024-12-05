@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Checkbox, Form, Input, Grid, Typography } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
-import { apiLogin } from "../../api/authentication";
+import { apiLogin } from "../../api/user";
 import backgroundImage from "../../images/login-background.jpg";
 import ForgotPasswordModal from "./ForgotPassword"; // Importe o modal
 
@@ -136,12 +136,13 @@ const Login = () => {
             </Button>
           </Form.Item>
 
-          <Form.Item>
+          {/*Funcionalidade de cadastro de usuários foi transferida para dentro do sistema*/
+          /* <Form.Item>
             <Text type="secondary">
               Ainda não tem conta?{" "}
               <Link to="/register-user">Cadastre-se aqui</Link>
             </Text>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </div>
 

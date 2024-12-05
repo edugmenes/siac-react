@@ -79,6 +79,7 @@ const EditUserPage = () => {
         idUser: user.idUser,
       };
       await updateUser(formattedValues);
+      console.log();
       notification.success({
         message: "Sucesso",
         description: "Usuário atualizado com sucesso!",
@@ -88,6 +89,7 @@ const EditUserPage = () => {
       notification.error({
         message: "Erro",
         description: `Falha na atualização: ${error.message}`,
+        
       });
     } finally {
       setIsLoading(false);

@@ -49,7 +49,7 @@ const Home = () => {
 
       {hasPermission("agendar_consultas") && (
         <CardComponent
-          title="Agendar Consultas"
+          title="Agendamentos"
           pathImage={actionImage}
           redirectPath="/appointment/scheduling"
         />
@@ -57,7 +57,7 @@ const Home = () => {
 
       {hasPermission("criar_agenda") && (
         <CardComponent
-          title="Criar Agendas"
+          title="Agendas"
           pathImage={calendarImage}
           redirectPath="/agenda/create-agenda"
         />

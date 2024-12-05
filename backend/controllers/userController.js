@@ -51,8 +51,7 @@ const userLogin = async (request, response) => {
 
 // Funções para cadastro de usuário:
 const userRegistration = async (request, response) => {
-
-    const { body } = request
+    const { body } = request;
 
     try {
         await userModel.registerUserData(body)
@@ -86,17 +85,17 @@ const userUpdate = async (request, response) => {
 
 const deleteUser = async (request, response) => {
     const { idUser } = request.body; // Assumindo que o id do usuário é passado no corpo da requisição
-  
+
     try {
-      await userModel.deleteUser(idUser);
-      return response
-        .status(200)
-        .json({ message: "Usuário deletado logicamente com sucesso!" });
+        await userModel.deleteUser(idUser);
+        return response
+            .status(200)
+            .json({ message: "Usuário deletado logicamente com sucesso!" });
     } catch (error) {
-      console.error('Erro ao realizar soft delete:', error);
-      return response
-        .status(500)
-        .json({ message: "Erro ao realizar soft delete do usuário" });
+        console.error('Erro ao realizar soft delete:', error);
+        return response
+            .status(500)
+            .json({ message: "Erro ao realizar soft delete do usuário" });
     }
 };
 

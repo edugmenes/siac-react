@@ -1,9 +1,9 @@
-const backendUrl = "https://siac-api.ddns.net";
-const localUrl = "http://localhost:5000"
+//const backendUrl = "https://siac-api.ddns.net";
+const backendUrl = "http://localhost:5000";
 
 const apiLogin = async (email, password) => {
   try {
-    const response = await fetch(`${localUrl}/auth/login`, {
+    const response = await fetch(`${backendUrl}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -16,7 +16,6 @@ const apiLogin = async (email, password) => {
     }
 
     const data = await response.json();
-    console.log("data: ", data);
     // Armazena JWT no localStorage:
     localStorage.setItem("authToken", data.token);
     return data;
@@ -27,8 +26,10 @@ const apiLogin = async (email, password) => {
 };
 
 const apiRegister = async (registerFormValues) => {
+  console.log("Chegou na API");
+  console.log(registerFormValues);
   try {
-    const response = await fetch(`${localUrl}/auth/register`, {
+    const response = await fetch(`${backendUrl}/user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +50,7 @@ const apiRegister = async (registerFormValues) => {
 
 const updateUser = async (userData) => {
   try {
-    const response = await fetch(`${localUrl}/update/${userData.idUser}`, {
+    const response = await fetch(`${backendUrl}/update/${userData.idUser}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -75,7 +76,7 @@ const deleteUser = async (idUser) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ idUser }), 
+      body: JSON.stringify({ idUser }),
     });
 
     if (!response.ok) {
