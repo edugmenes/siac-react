@@ -40,7 +40,7 @@ const registerProntuario = async (prontuarioData) => {
 const getProntuarios = async () => {
   try {
     const [prontuarios] = await promisePool.query(
-      `SELECT p.idProntuario, p.date, p.diagnosis, p.observations, p.patient, u.nome AS patient_name
+      `SELECT p.id, p.date, p.diagnosis, p.observations, p.patient, u.nome AS patient_name
             FROM prontuarios p
             JOIN usuario u ON p.patient = u.idUser`
     );
