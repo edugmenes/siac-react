@@ -6,7 +6,6 @@ import Home from "./pages/Home/Home.jsx";
 import PageLayout from "./components/PageLayout.jsx";
 import Settings from "./pages/Settings.jsx";
 import CreateAgenda from "./pages/Agenda/CreateAgenda.jsx";
-import Documents from "./pages/Documents.jsx";
 import Bin from "./pages/Help.jsx";
 import Appointment from "./pages/Appointment/Appointment.jsx";
 import AppointmentScheduling from "./pages/Appointment/AppointmentScheduling.jsx";
@@ -16,6 +15,7 @@ import RegisterUserPage from "./pages/Users/RegisterUser.jsx";
 import PatitentRecors from "./pages/Medical/PatientRecords.jsx";
 import Dashboard from "./pages/Panel/Dashboards.jsx";
 import InternalReports from "./pages/Reports/InternReports.jsx";
+import PatientRecordsList from "./pages/Documents.jsx";
 
 // Componente ProtectedRoute - Verifica se o usuário está autenticado:
 const ProtectedRoute = ({ element: Element, ...rest }) => {
@@ -39,7 +39,7 @@ const App = () => (
         />
         <Route
           path="documents"
-          element={<ProtectedRoute element={Documents} />}
+          element={<ProtectedRoute element={PatientRecordsList} />}
         />
         <Route
           path="appointments"

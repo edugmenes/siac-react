@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -8,20 +8,62 @@ import {
   Select,
   Row,
   Col,
-  message,
+  notification,
 } from "antd";
 import jsPDF from "jspdf";
+import dayjs from "dayjs";
+import { createPatientRegister } from "../../api/patientRecords";
+import { getUsersByRole } from "../../api/user";
+import { useNavigate } from "react-router-dom";
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 const PatientRecords = () => {
   const [form] = Form.useForm();
+  const [patients, setPatients] = useState([]);
+  const navigate = useNavigate();
 
-  const handleSubmit = (values) => {
-    console.log("Prontuário salvo:", values);
-    message.success("Prontuário salvo com sucesso!");
-    // Aqui você pode enviar os dados para uma API ou realizar outra ação
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await getUsersByRole(5);
+        const patientsToDropdown = response.data.map((d) => ({
+          label: d.nome,
+          value: d.idUser,
+        }));
+        setPatients(patientsToDropdown);
+      } catch (err) {
+        throw new Error(
+          err.message || "Erro desconhecido ao buscar pacientes."
+        );
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
+  const handleSubmit = async (values) => {
+    const date = dayjs(values.date);
+    const formattedDate = date.format("DD/MM/YYYY HH:mm");
+
+    const formattedValues = {
+      ...values,
+      date: formattedDate,
+    };
+
+    try {
+      await createPatientRegister(formattedValues);
+      notification.success({
+        message: "Prontuario cadastrado com sucesso!",
+        description: "Sucesso!",
+      });
+      navigate("/");
+    } catch (error) {
+      notification.error({
+        message: "Erro ao cadastrar prontuário",
+        description: error.message || "Erro desconhecido",
+      });
+    }
   };
 
   const handlePrint = async () => {
@@ -91,10 +133,11 @@ const PatientRecords = () => {
                 },
               ]}
             >
-              <Select placeholder="Selecione o paciente">
-                <Option value="patient1">Eduardo Gimenes</Option>
-                <Option value="patient2">Henrique Debia</Option>
-              </Select>
+              <Select
+                placeholder="Selecione o paciente"
+                size="large"
+                options={patients}
+              />
             </Form.Item>
 
             <Form.Item>
