@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   message,
+  Divider,
 } from "antd";
 import jsPDF from "jspdf";
 import { jwtDecode } from "jwt-decode";
@@ -141,12 +142,16 @@ const InternshipReport = () => {
                 <Option value="terapia ocupacional">Terapia Ocupacional</Option>
               </Select>
             </Form.Item>
-
+            <Divider />
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" size="large">
                 Salvar Relatório
               </Button>
-              <Button style={{ marginLeft: 10 }} onClick={handlePrint}>
+              <Button
+                style={{ marginLeft: 10 }}
+                onClick={handlePrint}
+                size="large"
+              >
                 Imprimir em PDF
               </Button>
             </Form.Item>

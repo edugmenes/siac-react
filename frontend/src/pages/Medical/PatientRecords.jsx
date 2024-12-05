@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   notification,
+  Divider,
 } from "antd";
 import jsPDF from "jspdf";
 import dayjs from "dayjs";
@@ -140,12 +141,16 @@ const PatientRecords = () => {
                 options={patients}
               />
             </Form.Item>
-
+            <Divider />
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" size="large">
                 Salvar Prontuário
               </Button>
-              <Button style={{ marginLeft: 10 }} onClick={handlePrint}>
+              <Button
+                style={{ marginLeft: 10 }}
+                onClick={handlePrint}
+                size="large"
+              >
                 Imprimir em PDF
               </Button>
             </Form.Item>
