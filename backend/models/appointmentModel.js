@@ -199,7 +199,9 @@ const getAppointments = async () => {
             INNER JOIN usuario u2 ON h.idPsico = u2.idUser
             INNER JOIN agenda a ON h.idAgenda = a.idAgenda 
         WHERE
-            h.status IN ('Agendada', 'Cancelada', 'Remarcada', 'Realizada');
+            h.status IN ('Agendada', 'Cancelada', 'Remarcada', 'Realizada')
+            AND u1.deletedAt is NULL 
+            AND u2.deletedAt is NULL ;
         `
     );
 
@@ -255,7 +257,7 @@ const getAppointmentsById = async (recordId) => {
 const deleteAppointment = async (idHorario) => {
   try {
     const [result] = await promisePool.query(
-      `UPDATE horario SET status = 'Cancelada' WHERE idHorario = ?`,
+      `UPDATE horario SET disponibilidade = 0, status = 'Cancelada' WHERE idHorario = ?`,
       [idHorario]
     );
 

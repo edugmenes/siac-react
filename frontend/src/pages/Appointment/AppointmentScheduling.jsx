@@ -14,6 +14,7 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
+import { useNavigate } from "react-router-dom"; // Mover para o topo, onde os hooks são definidos
 import {
   getDatesAvailableToScheduling,
   getProfessionalsForDate,
@@ -22,6 +23,7 @@ import {
 } from "../../api/appointment";
 
 const AppointmentScheduling = () => {
+  const navigate = useNavigate(); // Use o hook aqui no topo do componente
   const [availableDates, setAvailableDates] = useState([]);
   const [availableProfessionals, setAvailableProfessionals] = useState([]);
   const [availableHours, setAvailableHours] = useState([]);
@@ -74,7 +76,6 @@ const AppointmentScheduling = () => {
     console.log("Datas disponíveis: ", availableDates);
 
     try {
-      // Filtra as agendas que correspondem à data selecionada
       const selectedDateString = value.format("YYYY-MM-DD");
       console.log("Data selecionada: ", selectedDateString);
 
@@ -82,11 +83,9 @@ const AppointmentScheduling = () => {
         (item) => dayjs(item.data).format("YYYY-MM-DD") === selectedDateString
       );
 
-      // Coleta os idAgenda
       const idAgendas = selectedAgendas.map((agenda) => agenda.idAgenda);
       console.log("Agendas encontradas na data:", idAgendas);
 
-      // Faz a requisição passando a lista de idAgenda
       const response = await getProfessionalsForDate(idAgendas);
       if (response.success) {
         const professionals = response.data.map((prof) => ({
@@ -120,13 +119,11 @@ const AppointmentScheduling = () => {
     setAvailableHours([]);
     setSelectedTimeId(null);
 
-    // Encontrar o profissional selecionado e obter o idAgenda
     const selectedProfessionalData = availableProfessionals.find(
-      (prof) => prof.value === value // Comparar idPsico
+      (prof) => prof.value === value
     );
     console.log("Profissional escolhido: ", selectedProfessionalData);
 
-    // Passar apenas o idAgenda para a API
     const { idAgenda } = selectedProfessionalData;
 
     try {
@@ -175,6 +172,9 @@ const AppointmentScheduling = () => {
         message: "Sucesso",
         description: "Consulta agendada com sucesso!",
       });
+
+      // Redirecionar para a página /appointments
+      navigate("/appointments"); // Agora está dentro do componente, como deve ser
     } catch (error) {
       notification.error({
         message: "Erro",
