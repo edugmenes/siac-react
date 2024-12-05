@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import jsPDF from "jspdf";
 import { jwtDecode } from "jwt-decode";
 import { ValidacaoReport, registerReport } from "../../api/report";
-import { getUsersById, getUsers } from "../../api/authentication";
+import { getUsersById, getUsers } from "../../api/user";
 
 const { TextArea } = Input;
 const { Option } = Select;
