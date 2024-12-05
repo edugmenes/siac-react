@@ -61,44 +61,26 @@ const agendaCreation = async (request, response) => {
 };
 
 const appointmentScheduling = async (request, response) => {
-    const { date, professional, time } = request.body;
+    console.log("Chegou na controller!");
+    console.log(request.body);
+
+    const { idHorario, room } = request.body;
     const disponibilidade = 1;
-    const status = 'Agendada';
-    const idUser = request.user.idUser;
+    const status = "Agendada";
 
     try {
-        // Formatar a data e calcular a hora de término
-        const formattedDate = formatDate(date);
-        const dayOfWeek = getDayOfWeek(date);
-        const endTime = calculateEndTime(time);
-
         // Registrar a agenda e capturar o idAgenda
-        const agendaResult = await appointmentModel.registerAgenda({
-            date: formattedDate,
-            dayOfWeek: dayOfWeek,
-            professional,
-            initialTime: time,
-            endTime: endTime
+        const agendaResult = await appointmentModel.updateHourStatus({
+            idHorario,
+            sala: room,
+            disponibilidade: disponibilidade,
+            status: status
         });
 
-        if (!agendaResult.success) {
-            return response.status(400).json({ message: agendaResult.message, formValues: agendaResult.formValues });
-        }
-
-        const { idAgenda } = agendaResult.data; // Captura o id da agenda criada
-
-        // Registrar o horário com o idAgenda
-        const horarioResult = await appointmentModel.registerHours({
-            professional,
-            initialTime: time,
-            disponibilidade,
-            status
-        }, idUser, idAgenda);
-
-        if (horarioResult.success) {
-            return response.status(201).json({ message: horarioResult.message, data: horarioResult.data });
+        if (agendaResult.success) {
+            return response.status(201).json({ message: agendaResult.message, data: agendaResult.data });
         } else {
-            return response.status(400).json({ message: horarioResult.message });
+            return response.status(400).json({ message: agendaResult.message });
         }
     } catch (error) {
         return response.status(500).json({ message: error.message });

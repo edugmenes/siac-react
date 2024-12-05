@@ -1,10 +1,5 @@
 const promisePool = require("../config/databaseConfig");
 
-// const getAvailableAgendas = async (formValues) => {
-//   const ( )
-
-// }
-
 const registerAgenda = async (formValues) => {
   const { date, dayOfWeek, professional, initialTime, endTime } = formValues;
 
@@ -27,6 +22,40 @@ const registerAgenda = async (formValues) => {
     return {
       success: false,
       message: "Erro ao simular cadastro de agenda",
+      details: error.message,
+    };
+  }
+};
+
+const updateHourStatus = async (hourValues) => {
+  const { disponibilidade, status, sala, idHorario } = hourValues;
+
+  console.log("Chegou na model!")
+  console.log(hourValues);
+
+  try {
+    const [result] = await promisePool.query(
+      `UPDATE horario SET disponibilidade = ?, status = ?, sala = ?, WHERE idHorario = ?`,
+      [disponibilidade, status, sala, idHorario]
+    );
+
+    if (result.affectedRows > 0) {
+      return {
+        success: true,
+        message: "Horário atualizado com sucesso!",
+        data: { professional, initialTime },
+      };
+    } else {
+      return {
+        success: false,
+        message: "Horário não encontrado para atualização.",
+      };
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar horário:", error);
+    return {
+      success: false,
+      message: "Erro ao atualizar horário",
       details: error.message,
     };
   }
@@ -101,7 +130,7 @@ const getAgendaAvailableHours = async (idAgenda) => {
     // Executando a consulta no banco de dados
     const [hours] = await promisePool.query(
       `
-        SELECT hora 
+        SELECT idHorario, hora 
         FROM horario 
         WHERE idAgenda = ?
         AND disponibilidade = 0; 
@@ -214,6 +243,7 @@ const deleteAppointment = async (idHorario) => {
 
 module.exports = {
   registerAgenda,
+  updateHourStatus,
   registerHours,
   getAppointments,
   getAppointmentsById,
