@@ -5,7 +5,6 @@ const apiLogin = async (email, password) => {
   try {
     const response = await fetch(`${localUrl}/auth/login`, {
       method: "POST",
-      credentials: 'include', 
       headers: {
         "Content-Type": "application/json",
       },

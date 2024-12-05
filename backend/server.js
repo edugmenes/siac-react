@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser');
 
 // Configura middleware do CORS:
 app.use(cors({
-    origin: 'http://localhost:3000',  // Especifica a origem permitida
+    origin: '*',  // Especifica a origem permitida
     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Define os métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],  // Permite cabeçalhos específicos
     credentials: true  // Permite enviar cookies ou cabeçalhos de autenticação
