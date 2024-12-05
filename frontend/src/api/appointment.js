@@ -1,11 +1,12 @@
 //const backendUrl = "https://siac-api.ddns.net";
 const backendUrl = "http://localhost:5000";
 
-//debugger;
 const apiAppointmentScheduling = async (formValues, authToken) => {
+  console.log("Chegou na API: ", formValues);
+
   try {
     const response = await fetch(`${backendUrl}/appointment/scheduling`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Authorization': `Bearer ${authToken}`,
         'Content-Type': 'application/json',
@@ -76,6 +77,28 @@ const getDatesAvailableToScheduling = async () => {
       headers: {
         'Content-Type': 'application/json',
       }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
+const getProfessionalsForDate = async (idAgendas) => {
+  const ids = idAgendas.join(',');
+
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/professionals?ids=${ids}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) {
@@ -161,6 +184,7 @@ module.exports = {
   updateAppointment,
   getAppointments,
   getAppointmentById,
+  getProfessionalsForDate,
   deleteAppointment,
   getDatesAvailableToScheduling,
   getAvailableHoursToScheduling

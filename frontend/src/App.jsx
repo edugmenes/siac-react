@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Authentication/Login.jsx";
-import RegisterUser from "./pages/Authentication/RegisterUser.jsx";
 import Home from "./pages/Home/Home.jsx";
 import PageLayout from "./components/PageLayout.jsx";
 import Settings from "./pages/Settings.jsx";
@@ -29,7 +28,6 @@ const App = () => (
     <Routes>
       {/* Rotas de login e autenticação: */}
       <Route path="/login" element={<Login />} />
-      <Route path="register-user" element={<RegisterUser />} />
 
       {/* Rotas protegidas (apenas para usuários cadastrados e autenticados/logados): */}
       <Route
@@ -58,7 +56,11 @@ const App = () => (
         />
         <Route
           path="documents"
-          element={<ProtectedRoute element={PatientRecordsList} />}
+          element={
+            <ProtectedRoute>
+              <PatientRecordsList />
+            </ProtectedRoute>
+          }
         />
         <Route
           path="appointments"

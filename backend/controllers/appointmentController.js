@@ -61,17 +61,17 @@ const agendaCreation = async (request, response) => {
 };
 
 const appointmentScheduling = async (request, response) => {
-    console.log("Chegou na controller!");
-    console.log(request.body);
-
-    const { idHorario, room } = request.body;
+    console.log("Chegou na controller: ", request.body);
+    const idUser = request.user.idUser;
+    const { timeId, room } = request.body;
     const disponibilidade = 1;
-    const status = "Agendada";
+    const status = 'Agendada';
 
     try {
         // Registrar a agenda e capturar o idAgenda
         const agendaResult = await appointmentModel.updateHourStatus({
-            idHorario,
+            idUser: idUser,
+            idHorario: timeId,
             sala: room,
             disponibilidade: disponibilidade,
             status: status
@@ -214,6 +214,41 @@ const getAvailableHoursToScheduling = async (request, response) => {
     }
 }
 
+const getProfessionalsAvailableToScheduling = async (request, response) => {
+    const { ids } = request.query;
+    const idAgendas = ids ? ids.split(',') : [];
+
+    try {
+        if (!Array.isArray(idAgendas) || idAgendas.length === 0) {
+            return response.status(400).json({ message: 'Nenhuma agenda fornecida.' });
+        }
+
+        const psicosAvailable = [];  // Declara a variável uma vez fora do loop
+
+        for (const idAgenda of idAgendas) {
+            const result = await appointmentModel.getAgendaAvailablePsicos(idAgenda);
+
+            if (result.success) {
+                console.log(result);
+                psicosAvailable.push(...result.data);  // Adiciona os profissionais encontrados
+            }
+        }
+
+        if (psicosAvailable.length === 0) {
+            return response.status(404).json({ message: 'Nenhum profissional encontrado.' });
+        }
+
+        // Retorna os profissionais encontrados
+        response.status(200).json({ success: true, data: psicosAvailable });
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        response.status(500).json({
+            message: 'Não foi possível buscar profissionais.',
+            details: error.message,
+        });
+    }
+}
+
 const deleteAppointment = async (request, response) => {
     const { idHorario } = request.body;
 
@@ -237,5 +272,6 @@ module.exports = {
     getAppointmentsById,
     deleteAppointment,
     getDatesAvailableToScheduling,
-    getAvailableHoursToScheduling
+    getAvailableHoursToScheduling,
+    getProfessionalsAvailableToScheduling
 };
