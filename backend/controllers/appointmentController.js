@@ -61,14 +61,17 @@ const agendaCreation = async (request, response) => {
 };
 
 const appointmentScheduling = async (request, response) => {
-    const { idHorario, room } = request.body;
+    console.log("Chegou na controller: ", request.body);
+    const idUser = request.user.idUser;
+    const { timeId, room } = request.body;
     const disponibilidade = 1;
     const status = 'Agendada';
 
     try {
         // Registrar a agenda e capturar o idAgenda
         const agendaResult = await appointmentModel.updateHourStatus({
-            idHorario,
+            idUser: idUser,
+            idHorario: timeId,
             sala: room,
             disponibilidade: disponibilidade,
             status: status

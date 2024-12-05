@@ -46,7 +46,6 @@ const AppointmentScheduling = () => {
         const data = await getDatesAvailableToScheduling();
         if (data.success) {
           setAvailableDates(data.data);
-          console.log("Datas disponíveis:", data.data);
         } else {
           notification.error({
             message: "Erro",
@@ -57,6 +56,7 @@ const AppointmentScheduling = () => {
         console.error("Erro ao buscar datas disponíveis:", error);
       }
     };
+
     fetchAvailableDates();
   }, []);
 
@@ -71,10 +71,13 @@ const AppointmentScheduling = () => {
     setSelectedProfessional(null);
     setAvailableHours([]);
     setSelectedTimeId(null);
+    console.log("Datas disponíveis: ", availableDates);
 
     try {
       // Filtra as agendas que correspondem à data selecionada
       const selectedDateString = value.format("YYYY-MM-DD");
+      console.log("Data selecionada: ", selectedDateString);
+
       const selectedAgendas = availableDates.filter(
         (item) => dayjs(item.data).format("YYYY-MM-DD") === selectedDateString
       );
@@ -152,10 +155,12 @@ const AppointmentScheduling = () => {
   };
 
   const handleSubmit = async (values) => {
+    console.log("Valores submetidos: ", values);
     const formattedValues = {
       date: selectedDate.format("YYYY-MM-DD"),
       professional: selectedProfessional,
       timeId: selectedTimeId,
+      room: values.room,
     };
 
     const authToken = localStorage.getItem("authToken");
@@ -170,7 +175,6 @@ const AppointmentScheduling = () => {
         message: "Sucesso",
         description: "Consulta agendada com sucesso!",
       });
-      resetFields();
     } catch (error) {
       notification.error({
         message: "Erro",
@@ -216,6 +220,7 @@ const AppointmentScheduling = () => {
                   placeholder="Selecione o dia"
                   disabledDate={disabledDate}
                   allowClear
+                  onClear={() => setSelectedProfessional(null)}
                 />
               </Form.Item>
             </Col>
@@ -235,6 +240,7 @@ const AppointmentScheduling = () => {
                   options={availableProfessionals}
                   disabled={!selectedDate}
                   allowClear
+                  onClear={() => setSelectedTimeId(null)}
                 />
               </Form.Item>
             </Col>

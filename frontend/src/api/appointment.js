@@ -2,24 +2,24 @@
 const backendUrl = "http://localhost:5000";
 
 const apiAppointmentScheduling = async (formValues, authToken) => {
-  console.log(formValues);
+  console.log("Chegou na API: ", formValues);
 
   try {
-    // const response = await fetch(`${backendUrl}/appointment/scheduling`, {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Authorization': `Bearer ${authToken}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(formValues),
-    // });
+    const response = await fetch(`${backendUrl}/appointment/scheduling`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formValues),
+    });
 
-    // if (!response.ok) {
-    //   throw new Error(`Erro na requisição: ${response.statusText}`);
-    // }
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
 
-    // const data = await response.json();
-    // return data;
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Erro ao agendar consulta:', error);
   }

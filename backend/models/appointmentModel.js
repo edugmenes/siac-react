@@ -28,22 +28,19 @@ const registerAgenda = async (formValues) => {
 };
 
 const updateHourStatus = async (hourValues) => {
-  const { disponibilidade, status, sala, idHorario } = hourValues;
-
-  console.log("Chegou na model!")
-  console.log(hourValues);
+  console.log("Chegou na model: ", hourValues);
+  const { idUser, disponibilidade, status, sala, idHorario } = hourValues;
 
   try {
     const [result] = await promisePool.query(
-      `UPDATE horario SET disponibilidade = ?, status = ?, sala = ?, WHERE idHorario = ?`,
-      [disponibilidade, status, sala, idHorario]
+      `UPDATE horario SET idUser = ?, disponibilidade = ?, status = ?, sala = ? WHERE idHorario = ?`,
+      [idUser, disponibilidade, status, sala, idHorario]
     );
 
     if (result.affectedRows > 0) {
       return {
         success: true,
         message: "Horário atualizado com sucesso!",
-        data: { professional, initialTime },
       };
     } else {
       return {
