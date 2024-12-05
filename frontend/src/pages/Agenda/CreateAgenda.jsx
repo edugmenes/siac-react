@@ -18,8 +18,11 @@ import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { apiAgendaCreation } from "../../api/agenda";
+import { useNavigate } from "react-router-dom";
 
 const CreateAgenda = () => {
+  const navigate = useNavigate(); // Hook chamado no topo do componente
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedFinalDate, setSelectedFinalDate] = useState(null);
   const [selectedStartTime, setSelectedStartTime] = useState(null);
@@ -84,6 +87,10 @@ const CreateAgenda = () => {
     // Atualizar tabela apenas com novas entradas
     if (newEntries.length > 0) {
       setAgendas((prevAgendas) => [...prevAgendas, ...newEntries]);
+      notification.success({
+        message: "Sucesso",
+        description: "Agenda adicionada com sucesso.",
+      });
     } else {
       notification.warning({
         message: "Atenção",
@@ -106,6 +113,7 @@ const CreateAgenda = () => {
         description: "Agendas salvas com sucesso!",
       });
       setAgendas([]);
+      navigate("/"); // Redireciona para a tela inicial
     } catch (error) {
       notification.error({
         message: "Erro",
