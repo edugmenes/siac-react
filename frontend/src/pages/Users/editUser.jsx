@@ -11,7 +11,7 @@ import {
   notification,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteUser, getUsersById, updateUser } from "../../api/authentication";
+import { deleteUser, getUsersById, updateUser} from "../../api/authentication";
 import dayjs from "dayjs";
 
 const EditUserPage = () => {
@@ -21,30 +21,23 @@ const EditUserPage = () => {
   const [form] = Form.useForm();
   const { userId } = useParams();
   const navigate = useNavigate();
+
   useEffect(() => {
     setIsLoading(true);
     const fetchUser = async () => {
       try {
         const userData = await getUsersById(userId);
-        console.log("userData: ", userData)
-        var dataNascimento;
-        if(userData.success){
-           dataNascimento = userData.data.data_nascimento
+        const dataNascimento = userData.data.data_nascimento
           ? dayjs(userData.data.data_nascimento) // Converte para dayjs
-          : "";
-        }
-       console.log("userData: ", userData.data)
-        if(userData.data){
-          setUser(userData.data);
-          form.setFieldsValue({
-            nome: userData.data.nome,
-            email: userData.data.email,
-            celular: userData.data.celular,
-            perfil: userData.data.perfil,
-            data_nascimento: dataNascimento,
-          });
-        }
-        
+          : null;
+        setUser(userData.data);
+        form.setFieldsValue({
+          nome: userData.data.nome,
+          email: userData.data.email,
+          celular: userData.data.celular,
+          perfil: userData.data.perfil,
+          data_nascimento: dataNascimento,
+        });
       } catch (error) {
         console.error("Erro ao buscar os usuários: ", error);
       } finally {
@@ -76,13 +69,6 @@ const EditUserPage = () => {
 
   const handleFinish = async (values) => {
     try {
-      console.log("values: ", values)
-      var id;
-      if(userId == 'new'){
-        id = 0
-      }
-    
-      console.log("userId: ", userId)
       setIsLoading(true);
       const [key, label] = values.perfil.split("|");
       const formattedValues = {
@@ -90,9 +76,8 @@ const EditUserPage = () => {
         data_nascimento: values.data_nascimento.format("YYYY-MM-DD"),
         perfilId: perfilChanged ? key : user.id_perfil,
         perfilLabel: perfilChanged ? label : user.perfil,
-        idUser: id,
+        idUser: user.idUser,
       };
-      console.log("formattedValues: ", formattedValues)
       await updateUser(formattedValues);
       notification.success({
         message: "Sucesso",
@@ -193,7 +178,6 @@ const EditUserPage = () => {
                   { value: "3|recepcionista", label: "Recepcionista" },
                   { value: "1|administrador", label: "Administrador" },
                   { value: "5|psicologo", label: "Psicólogo" },
-                  { value: "6|estagiario", label: "Estagiário" },
                 ]}
                 onChange={() => setPerfilChanged(true)}
               />

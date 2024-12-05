@@ -50,7 +50,7 @@ const apiRegister = async (registerFormValues) => {
 
 const updateUser = async (userData) => {
   try {
-    const response = await fetch(`${backendUrl}/update/${userData.idUser}`, {
+    const response = await fetch(`${localUrl}/update/${userData.idUser}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -68,7 +68,6 @@ const userRegistration = async (request, response) => {
 
 const userUpdate = async (request, response) => {
     const { body } = request;
-    console.log("body: ", body);
     try {
         await userModel.updateUser(body);
         return response
