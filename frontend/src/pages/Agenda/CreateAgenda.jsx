@@ -166,7 +166,7 @@ const CreateAgenda = () => {
   return (
     <>
       <Typography.Title level={2} style={{ marginBottom: "30px" }}>
-        Criar Agenda de Atendimento
+        Criar Agenda
       </Typography.Title>
       <Row gutter={32}>
         <Col span={12}>

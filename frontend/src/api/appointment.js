@@ -2,10 +2,30 @@
 const backendUrl = "http://localhost:5000";
 
 const apiAppointmentScheduling = async (formValues, authToken) => {
-  console.log("Chegou na API: ", formValues);
-
   try {
     const response = await fetch(`${backendUrl}/appointment/scheduling`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formValues),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
+const appointmentRescheduling = async (recordId, formValues, authToken) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/rescheduling/${recordId}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${authToken}`,
@@ -154,38 +174,13 @@ const deleteAppointment = async (idHorario) => {
   }
 };
 
-const updateAppointment = async (recordId, formValues, authToken) => {
-  try {
-    const response = await fetch(`${backendUrl}/appointment/rescheduling/${recordId}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${authToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formValues),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Erro ao atualizar consulta:', error);
-    throw error;
-  }
-};
-
-
-
 module.exports = {
   apiAppointmentScheduling,
-  updateAppointment,
   getAppointments,
   getAppointmentById,
   getProfessionalsForDate,
   deleteAppointment,
   getDatesAvailableToScheduling,
-  getAvailableHoursToScheduling
+  getAvailableHoursToScheduling,
+  appointmentRescheduling
 };
