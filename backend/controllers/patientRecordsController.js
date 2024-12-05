@@ -18,7 +18,6 @@ const createPatientRecord = async (request, response) => {
 
 const getPatientRecordsHandler = async (request, response) => {
   try {
-    console.log("aaaaaaaaaaaaa");
     const prontuarios = await patientRecordsModel.getProntuarios();
 
     return response.status(200).json({

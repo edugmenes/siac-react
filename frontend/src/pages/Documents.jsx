@@ -1,5 +1,5 @@
-import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Row, Space, Table, Typography } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button, Row, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPatientRecords } from "../api/patientRecords";
@@ -17,11 +17,9 @@ const PatientRecordsList = () => {
   const fetchRecords = async () => {
     setIsLoading(true);
     try {
-      console.log('a')
       const response = await getPatientRecords();
-
-      console.log('response', response)
-      setRecords(response);
+      setRecords(response.prontuarios);
+      console.log('rea', response.prontuarios)
     } catch (error) {
       console.error("Erro ao buscar os prontuarios: ", error);
     } finally {
@@ -35,28 +33,50 @@ const PatientRecordsList = () => {
 
   const columns = [
     {
-      title: "Nome",
-      dataIndex: "nome",
-      key: "nome",
-      width: 220,
+      title: "Nome do paciente",
+      dataIndex: "patient_name",
+      key: "patient_name",
     },
     {
-      title: "E-Mail",
-      dataIndex: "email",
-      key: "email",
-      width: 300,
+      title: "Diagnóstico",
+      dataIndex: "diagnosis",
+      key: "diagnosis",
     },
     {
-      title: "Celular",
-      dataIndex: "celular",
-      key: "celular",
-      width: 200,
+      title: "Observações",
+      dataIndex: "observations",
+      key: "observations",
+      render: (observations) => {
+        if (!observations) return "Sem observações";
+        
+        const { sintomas, tratamento } = observations;
+    
+        return (
+          <div>
+            <strong>Sintomas:</strong>
+            <ul>
+              {sintomas?.map((sintoma, index) => (
+                <li key={index}>{sintoma}</li>
+              ))}
+            </ul>
+            <strong>Tratamento:</strong> {tratamento || "Não informado"}
+          </div>
+        );
+      },
     },
     {
-      title: "Perfil",
-      dataIndex: "perfil",
-      key: "perfil",
-      width: 195,
+      title: "Data",
+      dataIndex: "date",
+      key: "date",
+      render: (date) => {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, "0");
+        const minutes = String(d.getMinutes()).padStart(2, "0");
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+      },
     },
   ];
 
@@ -67,9 +87,9 @@ const PatientRecordsList = () => {
         align="middle"
         style={{ marginBottom: "40px" }}
       >
-        <Typography.Title level={2}> Usuários </Typography.Title>
+        <Typography.Title level={2}>Prontuários</Typography.Title>
         <Button type="link" size="large" onClick={handleCreate}>
-          <PlusOutlined /> Criar usuário
+          <PlusOutlined /> Criar prontuário
         </Button>
       </Row>
       <Row>

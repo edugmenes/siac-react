@@ -22,7 +22,6 @@ const createPatientRegister = async (registerFormValues) => {
 };
 
 const getPatientRecords = async () => {
-  console.log("Chegou na API para buscar prontuários");
   try {
     const response = await fetch(`${backendUrl}/patient-records/get`, {
       method: "GET",
@@ -34,11 +33,10 @@ const getPatientRecords = async () => {
     if (!response.ok) {
       throw new Error(`Erro na requisição: ${response.statusText}`);
     }
-
-    const data = await response.json();
+    
+    const { data } = await response.json();
     return data;
   } catch (error) {
-    console.error("Falha ao buscar prontuários: ", error);
     throw error;
   }
 };
