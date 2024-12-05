@@ -14,52 +14,114 @@ import {
 import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
-import { getUsersByRole } from "../../api/user";
-import { apiAppointmentScheduling } from "../../api/appointment";
+import {
+  apiAppointmentScheduling,
+  getDatesAvailableToScheduling,
+  getAvailableHoursToScheduling,
+} from "../../api/appointment";
 
 const AppointmentScheduling = () => {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [doctors, setDoctors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedProfessional, setSelectedProfessional] = useState(null);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [availableProfessionals, setAvailableProfessionals] = useState([]);
+  const [availableHours, setAvailableHours] = useState([]);
+  const [selectedTimeId, setSelectedTimeId] = useState(null); // Guarda o id do horário selecionado
+  const [rooms, setRooms] = useState([]);
 
   useEffect(() => {
-    const fetchDoctors = async () => {
+    // Mock para as salas
+    const mockRooms = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"].map(
+      (room) => ({
+        label: room,
+        value: room,
+      })
+    );
+    setRooms(mockRooms);
+
+    // Requisição para obter as datas disponíveis
+    const fetchAvailableDates = async () => {
       try {
-        const response = await getUsersByRole(5);
-        const doctorsToDropdown = response.data.map((d) => ({
-          label: d.nome,
-          value: d.idUser,
-        }));
-        setDoctors(doctorsToDropdown);
+        const data = await getDatesAvailableToScheduling();
+
+        if (data.success) {
+          setAvailableDates(data.data);
+        } else {
+          notification.error({
+            message: "Erro",
+            description: data.message,
+          });
+        }
       } catch (error) {
-        console.error("Erro ao buscar psicólogos:", error);
-      } finally {
-        setLoading(false);
+        console.error("Erro ao buscar datas disponíveis:", error);
       }
     };
 
-    fetchDoctors();
+    fetchAvailableDates();
   }, []);
 
-  const handleDateChange = (value, dateString) => {
+  const handleDateChange = (value) => {
     setSelectedDate(value);
+
+    // Filtra os profissionais disponíveis para a data selecionada
+    const selectedDateString = value.format("YYYY-MM-DD");
+    const filteredProfessionals = availableDates
+      .filter(
+        (item) => dayjs(item.data).format("YYYY-MM-DD") === selectedDateString
+      )
+      .map((item) => ({
+        label: item.nome,
+        value: item.idPsico,
+      }));
+
+    setAvailableProfessionals(filteredProfessionals); // Atualiza os profissionais disponíveis
   };
 
-  const handleTimeChange = (value, dateString) => {
-    setSelectedTime(value);
-    console.log("Data e hora selecionadas:", value, dateString);
+  const handleProfessionalChange = async (value) => {
+    setSelectedProfessional(value);
+
+    // Obter os horários disponíveis para o profissional selecionado
+    const selectedProfessionalData = availableDates.filter(
+      (item) => item.idPsico === value
+    );
+
+    if (selectedProfessionalData.length > 0) {
+      const idAgenda = selectedProfessionalData[0].idAgenda;
+
+      try {
+        const response = await getAvailableHoursToScheduling(idAgenda);
+        if (response.success) {
+          const formattedHours = response.data.map((item) => {
+            const hour = dayjs(item.hora, "HH:mm:ss").format("HH:mm"); // Formata para HH:mm
+            return {
+              label: hour,
+              value: hour,
+              idHorario: item.idHorario, // Aqui passamos o idHorario
+            };
+          });
+          setAvailableHours(formattedHours); // Atualiza os horários disponíveis
+        } else {
+          notification.error({
+            message: "Erro",
+            description: response.message,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao buscar horários disponíveis:", error);
+      }
+    }
   };
 
-  const handleProfessionalChange = (value) => {
-    console.log(value);
+  const handleTimeChange = (value, option) => {
+    setSelectedTimeId(option.idHorario); // Armazena o idHorario do horário selecionado
   };
 
   const handleSubmit = async (values) => {
     const formattedValues = {
       ...values,
       date: values.date ? dayjs(values.date).format("DD/MM/YYYY") : null,
-      time: values.time ? dayjs(values.time).format("HH:mm") : null,
+      time: values.time,
+      idHorario: selectedTimeId,
     };
 
     const authToken = localStorage.getItem("authToken");
@@ -72,7 +134,7 @@ const AppointmentScheduling = () => {
       await apiAppointmentScheduling(formattedValues, authToken);
       notification.success({
         message: "Sucesso",
-        description: "Consultas agendada com sucesso!",
+        description: "Consulta agendada com sucesso!",
       });
     } catch (error) {
       notification.error({
@@ -82,114 +144,107 @@ const AppointmentScheduling = () => {
     }
   };
 
-  const disabledHours = () => {
-    const hours = [];
-    for (let i = 0; i < 24; i++) {
-      if (i < 7 || i >= 19) {
-        hours.push(i);
-      }
-    }
-    return hours;
-  };
-
-  const disabledMinutes = (selectedHour) => {
-    const minutes = [];
-    for (let i = 0; i < 60; i++) {
-      if (i % 15 !== 0) {
-        minutes.push(i);
-      }
-    }
-    return minutes;
-  };
-
   const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+    // Desabilita datas que não estão na lista de datas disponíveis
+    return (
+      current &&
+      !availableDates.some((date) => dayjs(date.data).isSame(current, "day"))
+    );
   };
 
   return (
     <>
       <Typography.Title level={2} style={{ marginBottom: "40px" }}>
-        Agendamento de Consulta
+        Agendar Consulta
       </Typography.Title>
       <Form layout="vertical" onFinish={handleSubmit}>
         <ConfigProvider locale={ptBR}>
-          <div>
-            <Row>
-              <Col span={6}>
-                <Form.Item
-                  label="Selecione a data:"
-                  name="date"
-                  rules={[{ required: true, message: "Selecione uma data" }]}
-                >
-                  <DatePicker
-                    onChange={handleDateChange}
-                    format="DD/MM/YYYY"
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="Selecione o dia"
-                    disabledDate={disabledDate}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <Form.Item
-                  label="Selecione o horário:"
-                  name="time"
-                  rules={[{ required: true, message: "Selecione um horário" }]}
-                >
-                  <DatePicker
-                    picker="time"
-                    onChange={handleTimeChange}
-                    showTime={{
-                      hideDisabledOptions: true,
-                      disabledHours,
-                      disabledMinutes,
-                    }}
-                    format="HH:mm"
-                    style={{ width: "100%" }}
-                    size="large"
-                    placeholder="Selecione a hora"
-                    disabled={!selectedDate}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={6}>
-                <Form.Item
-                  label="Selecione o profissional:"
-                  name="professional"
-                  rules={[
-                    { required: true, message: "Selecione um profissional" },
-                  ]}
-                >
-                  <Select
-                    style={{ width: "100%" }}
-                    onChange={handleProfessionalChange}
-                    size="large"
-                    placeholder="Selecione o profissional"
-                    options={doctors}
-                    disabled={!selectedTime}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              <Col span={2}>
-                <Button
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione a data:"
+                name="date"
+                rules={[{ required: true, message: "Selecione uma data" }]}
+              >
+                <DatePicker
+                  onChange={handleDateChange}
+                  format="DD/MM/YYYY"
+                  style={{ width: "100%" }}
                   size="large"
-                  htmlType="submit"
-                  type="primary"
-                  style={{ marginTop: "30px" }}
-                >
-                  Agendar consulta
-                </Button>
-              </Col>
-            </Row>
-          </div>
+                  placeholder="Selecione o dia"
+                  disabledDate={disabledDate}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione o profissional:"
+                name="professional"
+                rules={[
+                  { required: true, message: "Selecione um profissional" },
+                ]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  onChange={handleProfessionalChange}
+                  size="large"
+                  placeholder="Selecione o profissional"
+                  options={availableProfessionals}
+                  disabled={!selectedDate}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione o horário:"
+                name="time"
+                rules={[{ required: true, message: "Selecione um horário" }]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  size="large"
+                  placeholder="Selecione o horário"
+                  options={availableHours.map((hora) => ({
+                    label: hora.label,
+                    value: hora.value,
+                    idHorario: hora.idHorario, // Passa o idHorario na opção
+                  }))}
+                  onChange={handleTimeChange} // Chama a função para capturar o idHorario
+                  disabled={!selectedDate || !selectedProfessional}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione a sala:"
+                name="room"
+                rules={[{ required: true, message: "Selecione uma sala" }]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  size="large"
+                  placeholder="Selecione a sala"
+                  options={rooms}
+                  disabled={!selectedDate || !selectedProfessional}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Divider />
+          <Row>
+            <Col span={2}>
+              <Button
+                size="large"
+                htmlType="submit"
+                type="primary"
+                style={{ marginRight: "10px" }}
+              >
+                Agendar consulta
+              </Button>
+            </Col>
+          </Row>
         </ConfigProvider>
       </Form>
     </>
