@@ -38,7 +38,7 @@ const getUserProfileAndPermissions = async (idUser) => {
 // Cadastra usuário no banco de dados:
 const registerUserData = async (registerFormData) => {
     const { nomeUser, email, perfilLabel, perfilId, password } = registerFormData;
-
+    console.log(nomeUser, email, perfilLabel, perfilId, password)
     try {
         const [existingUser] = await promisePool.query(
             `SELECT * FROM usuario WHERE email = ?`,
@@ -75,57 +75,95 @@ const registerUserData = async (registerFormData) => {
 }
 
 const updateUser = async (userData) => {
-    const {
-        idUser,
-        nome,
-        email,
-        perfilLabel,
-        perfilId,
-        celular,
-        data_nascimento,
-    } = userData;
+    console.log("userData: ", userData);
 
     try {
-        const [existingUser] = await promisePool.query(
-            `SELECT * FROM usuario WHERE idUser = ?`,
-            [idUser]
-        );
+        const {
+            idUser,
+            nome,
+            email,
+            perfilLabel,
+            perfilId,
+            celular,
+            data_nascimento,
+            password
+        } = userData;
 
-        if (existingUser.length === 0) {
-            throw new Error("Usuário não encontrado.");
-        }
+        // Se o ID do usuário for 0, significa que é uma inserção
+        if (idUser === 0) {
+            console.log("entrou no bloco de inserção");
 
-        const [emailUser] = await promisePool.query(
-            `SELECT * FROM usuario WHERE email = ? AND idUser != ?`,
-            [email, idUser]
-        );
+            var query = `INSERT INTO usuario(nome, email, perfil, id_perfil, celular, data_nascimento, password) VALUES (?,?,?,?,?,?,?)`;
+            var [insertResult] = await promisePool.query(query, [nome, email, perfilLabel, perfilId, celular, data_nascimento, password]);
 
-        if (emailUser.length > 0) {
-            throw new Error("Email já cadastrado por outro usuário.");
-        }
+            console.log("insertResult:", insertResult);
 
-        const [result] = await promisePool.query(
-            `UPDATE usuario SET nome = ?, email = ?, perfil = ?, id_perfil = ?, celular = ?, data_nascimento = ? WHERE idUser = ?`,
-            [nome, email, perfilLabel, perfilId, celular, data_nascimento, idUser]
-        );
+            if (insertResult.affectedRows > 0) {
+                var userId = insertResult.insertId;
 
-        const [updatePerfil] = await promisePool.query(
-            `UPDATE usuario_perfil SET id_perfil = ? WHERE id_usuario = ?`,
-            [perfilId, idUser]
-        );
+                // Pegar os dados do usuário recém-inserido
+                var user = await getUserById(userId);
+                console.log("User inserido:", user);
 
-        if (result.affectedRows > 0) {
-            return {
-                success: true,
-                message: "Usuário atualizado com sucesso!",
-            };
+                var id_perfil = user.data.id_perfil;
+                console.log("perfilId:", perfilId);
+                console.log("ID do usuário inserido:", userId);
+
+                // Inserir na tabela 'usuario_perfil'
+                var query2 = `INSERT INTO usuario_perfil(id_usuario, id_perfil) VALUES(?,?)`;
+                await promisePool.query(query2, [userId, perfilId]);
+
+                return {
+                    success: true,
+                    message: "Usuário inserido com sucesso!",
+                };
+            }
         } else {
-            throw new Error("Falha ao atualizar o usuário.");
+            // Se o ID do usuário for diferente de 0, significa que é uma atualização
+            const [existingUser] = await promisePool.query(
+                `SELECT * FROM usuario WHERE idUser = ?`,
+                [idUser]
+            );
+
+            if (existingUser.length === 0) {
+                throw new Error("Usuário não encontrado.");
+            }
+
+            const [emailUser] = await promisePool.query(
+                `SELECT * FROM usuario WHERE email = ? AND idUser != ?`,
+                [email, idUser]
+            );
+
+            if (emailUser.length > 0) {
+                throw new Error("Email já cadastrado por outro usuário.");
+            }
+
+            const [result] = await promisePool.query(
+                `UPDATE usuario SET nome = ?, email = ?, perfil = ?, id_perfil = ?, celular = ?, data_nascimento = ? WHERE idUser = ?`,
+                [nome, email, perfilLabel, perfilId, celular, data_nascimento, idUser]
+            );
+
+            const [updatePerfil] = await promisePool.query(
+                `UPDATE usuario_perfil SET id_perfil = ? WHERE id_usuario = ?`,
+                [perfilId, idUser]
+            );
+
+            if (result.affectedRows > 0) {
+                return {
+                    success: true,
+                    message: "Usuário atualizado com sucesso!",
+                };
+            } else {
+                throw new Error("Falha ao atualizar o usuário.");
+            }
         }
+
     } catch (error) {
+        console.error("Erro:", error.message);
         throw new Error(error.message);
     }
 };
+
 
 const deleteUser = async (idUser) => {
     const deletedAt = new Date();

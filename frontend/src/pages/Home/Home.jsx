@@ -6,6 +6,7 @@ import actionImage from "../../images/action-button.png";
 import dashboardImage from "../../images/dashboard-button.png";
 import folderImage from "../../images/folder-button.png";
 import { jwtDecode } from "jwt-decode";
+import { getUsersById } from "../../api/authentication";
 
 const Home = () => {
   const [permissions, setPermissions] = useState([]);
@@ -70,7 +71,7 @@ const Home = () => {
         />
       )}
 
-      {hasPermission("criar_relatorios") && (
+      {hasPermission("criar_relatorio") && (
         <CardComponent
           title="Relatórios"
           pathImage={scheduleImage}

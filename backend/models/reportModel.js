@@ -41,8 +41,30 @@ const getEstagiarioProfessor = async()=>{
 
     }
 }
+const registerReport = async (values) => {
+    try {
+        var obj = {
+            ok: false,
+            mensagem: ""
+        };
+
+        var query = `INSERT INTO report(idEstagiario, idSupervisor, area_atuacao, atividades_realizadas, feedback_supervisor) values(?,?,?,?,?)`;
+        var [resultado] = await promisePool.query(query, [values.internName, values.supervisor, values.area, values.activities, values.feedback]);
+        console.log("resultado: ", resultado);
+
+        if (resultado.affectedRows > 0) {
+            obj.ok = true;
+            obj.mensagem = "Relatório Inserido com Sucesso";
+        }
+        return obj;  // Corrigido
+    } catch (error) {
+        console.log("erro: ", error);
+        return { ok: false, mensagem: "Erro ao inserir relatório" };  // Retorna um objeto em caso de erro
+    }
+};
 
 module.exports = {
     getDadosReport,
-    getEstagiarioProfessor
+    getEstagiarioProfessor,
+    registerReport
 };

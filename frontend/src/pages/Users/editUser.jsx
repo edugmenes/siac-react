@@ -21,7 +21,6 @@ const EditUserPage = () => {
   const [form] = Form.useForm();
   const { userId } = useParams();
   const navigate = useNavigate();
-
   useEffect(() => {
     setIsLoading(true);
     const fetchUser = async () => {
@@ -78,13 +77,11 @@ const EditUserPage = () => {
   const handleFinish = async (values) => {
     try {
       console.log("values: ", values)
-      var userId;
-      if(!user.idUser || user.idUser == 0){
-        userId = 0
+      var id;
+      if(userId == 'new'){
+        id = 0
       }
-      else{
-        userId = user.idUser
-      }
+    
       console.log("userId: ", userId)
       setIsLoading(true);
       const [key, label] = values.perfil.split("|");
@@ -93,7 +90,7 @@ const EditUserPage = () => {
         data_nascimento: values.data_nascimento.format("YYYY-MM-DD"),
         perfilId: perfilChanged ? key : user.id_perfil,
         perfilLabel: perfilChanged ? label : user.perfil,
-        idUser: userId,
+        idUser: id,
       };
       console.log("formattedValues: ", formattedValues)
       await updateUser(formattedValues);

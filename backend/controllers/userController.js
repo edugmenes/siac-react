@@ -38,7 +38,7 @@ const userLogin = async (request, response) => {
             process.env.JWT_SECRET_KEY,
             { expiresIn: '1h' }
         );
-        request.session.User = user;
+        // request.session.User = user;
 
         console.log("request.session.User: ", request.session.User)
         // Retorna o token:
@@ -52,7 +52,8 @@ const userLogin = async (request, response) => {
 // Funções para cadastro de usuário:
 const userRegistration = async (request, response) => {
 
-    const { body } = request;
+    const { body } = request
+
     try {
         await userModel.registerUserData(body)
         return response.status(201).json({ message: 'Usuário cadastrado com sucesso!' })
@@ -67,6 +68,7 @@ const userRegistration = async (request, response) => {
 
 const userUpdate = async (request, response) => {
     const { body } = request;
+    console.log("body: ", body);
     try {
         await userModel.updateUser(body);
         return response

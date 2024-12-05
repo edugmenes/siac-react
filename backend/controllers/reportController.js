@@ -15,12 +15,22 @@ const validacaoReport = async (req, res) => {
     }
 };
 
-const getEstagiarioProfessor = async(req,res)=>{
-    try{
+    
+
+const registerReport = async(req,res)=>{
+    try {
+      
+        console.log("body: ", req.body);
+
+        var resultadoObj = await reportModel.registerReport(req.body);
+        console.log("res", resultadoObj)
+
+        res.status(200).json(resultadoObj);
+
+
+
+    } catch (error) {
         
     }
-    catch(error){
-
-    }
 }
-module.exports = { validacaoReport };
+module.exports = { validacaoReport ,registerReport,};

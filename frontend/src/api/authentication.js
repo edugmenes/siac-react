@@ -29,7 +29,7 @@ const apiLogin = async (email, password) => {
 
 const apiRegister = async (registerFormValues) => {
   try {
-    const response = await fetch(`${backendUrl}/auth/register`, {
+    const response = await fetch(`${localUrl}/auth/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

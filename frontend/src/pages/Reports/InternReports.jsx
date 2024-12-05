@@ -10,36 +10,59 @@ import {
   message,
   DatePicker,
 } from "antd";
+import { useNavigate } from 'react-router-dom';
+
 import jsPDF from "jspdf";
 import { jwtDecode } from "jwt-decode";
-import { ValidacaoReport,getEstagiarioProfessor } from "../../api/report";
+import { ValidacaoReport, registerReport } from "../../api/report";
+import { getUsersById, getUsers } from "../../api/authentication";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
 const InternshipReport = () => {
+  const navigate = useNavigate();
+
   const [form] = Form.useForm();
+  const [userName, setUserName] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [perfilId, setPerfilId] = useState(null);
+  const [usersSupervisors, setSupervisors] = useState([]);
   const [isSupervisorDisabled, setIsSupervisorDisabled] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("authToken");
 
-    if (token) {
-      const decodedToken = jwtDecode(token);
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        const user = await getUsersById(decodedToken.idUser);
+        const supervisores = (await getUsers()).data.filter(x => x.id_perfil == 4);
+        
 
-      if (true /*decodedToken.perfil === "professor"*/) {
-        form.setFieldsValue({ supervisor: "Seu Nome" });
-        setIsSupervisorDisabled(true);
+        if (user) {
+          setUserName(user.data.nome);  // Armazena o nome do estagiário
+          setPerfilId(user.data.id_perfil);  // Armazena o perfilId
+          setUserId(user.data.idUser);
+          setSupervisors(supervisores);
+        }
+
+        if (decodedToken.perfil === "professor") {
+          form.setFieldsValue({ supervisor: "Seu Nome" });
+          setIsSupervisorDisabled(true);
+        }
       }
-    }
 
-    var Dados = ValidacaoReport();
-    console.log("dados: ", Dados);
+
+    };
+
+    fetchUserData();  // Chama a função assíncrona
   }, [form]);
 
-  const handleSubmit = (values) => {
-    console.log("Relatório de Estágio salvo:", values);
-    message.success("Relatório de Estágio salvo com sucesso!");
+  const handleSubmit = async(values) => {
+    var resultado = await registerReport(values)
+    message.success(resultado.mensagem);
+    navigate('/');
   };
 
   const handlePrint = async () => {
@@ -91,10 +114,8 @@ const InternshipReport = () => {
               label="Nome do Estagiário"
               rules={[{ required: true, message: "Por favor, selecione o estagiário!" }]}
             >
-              <Select placeholder="Selecione o estagiário">
-                <Option value="estagiario1">Ana Souza</Option>
-                <Option value="estagiario2">Pedro Lima</Option>
-                <Option value="estagiario3">Maria Santos</Option>
+              <Select placeholder="Selecione o estagiário" value={userName}>
+                {perfilId === 6 && <Option value={userId}>{userName}</Option>}
               </Select>
             </Form.Item>
 
@@ -107,8 +128,13 @@ const InternshipReport = () => {
                 placeholder="Selecione o supervisor"
                 disabled={isSupervisorDisabled}
               >
-                <Option value="supervisor1">Dr. Silva</Option>
-                <Option value="supervisor2">Dra. Pereira</Option>
+                <option value="">Selecione</option>
+                {usersSupervisors.map(supervisor => (
+                    <option key={supervisor.idUser} value={supervisor.idUser}>
+                        {supervisor.nome}
+                    </option>
+                ))}
+
               </Select>
             </Form.Item>
 

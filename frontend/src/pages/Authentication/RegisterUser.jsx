@@ -224,6 +224,7 @@ const RegisterUser = () => {
                       { value: "3|recepcionista", label: "Recepcionista" },
                       { value: "1|administrador", label: "Administrador" },
                       { value: "5|psicologo", label: "Psicólogo" },
+                      { value: "6|estagiario", label: "Estagiário" },
                     ]}
                   />
                 </Col>
