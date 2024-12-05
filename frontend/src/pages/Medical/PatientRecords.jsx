@@ -110,6 +110,7 @@ const PatientRecords = () => {
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: "100%" }}
                 placeholder="Selecione a data"
+                size="large"
               />
             </Form.Item>
 
@@ -120,7 +121,7 @@ const PatientRecords = () => {
                 { required: true, message: "Por favor, insira o diagnóstico!" },
               ]}
             >
-              <Input placeholder="Digite o diagnóstico" />
+              <Input placeholder="Digite o diagnóstico" size="large" />
             </Form.Item>
 
             <Form.Item
@@ -163,7 +164,7 @@ const PatientRecords = () => {
             >
               <TextArea
                 rows={9}
-                autoSize={{ minRows: 9, maxRows: 16 }}
+                autoSize={{ minRows: 10, maxRows: 16 }}
                 placeholder="Digite as observações do prontuário"
               />
             </Form.Item>

@@ -88,6 +88,7 @@ const InternshipReport = () => {
                 format="DD/MM/YYYY"
                 style={{ width: "100%" }}
                 placeholder="Selecione a data"
+                size="large"
               />
             </Form.Item>
 
@@ -101,7 +102,7 @@ const InternshipReport = () => {
                 },
               ]}
             >
-              <Input placeholder="Digite o nome do estagiário" />
+              <Input placeholder="Digite o nome do estagiário" size="large" />
             </Form.Item>
 
             <Form.Item
@@ -117,6 +118,7 @@ const InternshipReport = () => {
               <Select
                 placeholder="Selecione o supervisor"
                 disabled={isSupervisorDisabled}
+                size="large"
               >
                 <Option value="supervisor1">Dr. Silva</Option>
                 <Option value="supervisor2">Dra. Pereira</Option>
@@ -133,7 +135,7 @@ const InternshipReport = () => {
                 },
               ]}
             >
-              <Select placeholder="Selecione a área de atuação">
+              <Select placeholder="Selecione a área de atuação" size="large">
                 <Option value="psicologia">Psicologia</Option>
                 <Option value="fonoaudiologia">Fonoaudiologia</Option>
                 <Option value="terapia ocupacional">Terapia Ocupacional</Option>
@@ -163,7 +165,7 @@ const InternshipReport = () => {
             >
               <TextArea
                 rows={5}
-                autoSize={{ minRows: 5, maxRows: 10 }}
+                autoSize={{ minRows: 5.65, maxRows: 10 }}
                 placeholder="Descreva as atividades realizadas pelo estagiário"
               />
             </Form.Item>
@@ -180,7 +182,7 @@ const InternshipReport = () => {
             >
               <TextArea
                 rows={5}
-                autoSize={{ minRows: 5, maxRows: 10 }}
+                autoSize={{ minRows: 5.65, maxRows: 10 }}
                 placeholder="Digite o feedback do supervisor sobre o desempenho do estagiário"
               />
             </Form.Item>
