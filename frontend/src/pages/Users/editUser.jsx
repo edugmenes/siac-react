@@ -27,17 +27,25 @@ const EditUserPage = () => {
     const fetchUser = async () => {
       try {
         const userData = await getUsersById(userId);
-        const dataNascimento = userData.data.data_nascimento
+        console.log("userData: ", userData)
+        var dataNascimento;
+        if(userData.success){
+           dataNascimento = userData.data.data_nascimento
           ? dayjs(userData.data.data_nascimento) // Converte para dayjs
-          : null;
-        setUser(userData.data);
-        form.setFieldsValue({
-          nome: userData.data.nome,
-          email: userData.data.email,
-          celular: userData.data.celular,
-          perfil: userData.data.perfil,
-          data_nascimento: dataNascimento,
-        });
+          : "";
+        }
+       console.log("userData: ", userData.data)
+        if(userData.data){
+          setUser(userData.data);
+          form.setFieldsValue({
+            nome: userData.data.nome,
+            email: userData.data.email,
+            celular: userData.data.celular,
+            perfil: userData.data.perfil,
+            data_nascimento: dataNascimento,
+          });
+        }
+        
       } catch (error) {
         console.error("Erro ao buscar os usuários: ", error);
       } finally {
@@ -69,6 +77,15 @@ const EditUserPage = () => {
 
   const handleFinish = async (values) => {
     try {
+      console.log("values: ", values)
+      var userId;
+      if(!user.idUser || user.idUser == 0){
+        userId = 0
+      }
+      else{
+        userId = user.idUser
+      }
+      console.log("userId: ", userId)
       setIsLoading(true);
       const [key, label] = values.perfil.split("|");
       const formattedValues = {
@@ -76,8 +93,9 @@ const EditUserPage = () => {
         data_nascimento: values.data_nascimento.format("YYYY-MM-DD"),
         perfilId: perfilChanged ? key : user.id_perfil,
         perfilLabel: perfilChanged ? label : user.perfil,
-        idUser: user.idUser,
+        idUser: userId,
       };
+      console.log("formattedValues: ", formattedValues)
       await updateUser(formattedValues);
       notification.success({
         message: "Sucesso",
@@ -178,6 +196,7 @@ const EditUserPage = () => {
                   { value: "3|recepcionista", label: "Recepcionista" },
                   { value: "1|administrador", label: "Administrador" },
                   { value: "5|psicologo", label: "Psicólogo" },
+                  { value: "6|estagiario", label: "Estagiário" },
                 ]}
                 onChange={() => setPerfilChanged(true)}
               />

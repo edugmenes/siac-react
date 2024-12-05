@@ -3,15 +3,16 @@ import {
   Form,
   Input,
   Button,
-  DatePicker,
   Typography,
   Select,
   Row,
   Col,
   message,
+  DatePicker,
 } from "antd";
 import jsPDF from "jspdf";
 import { jwtDecode } from "jwt-decode";
+import { ValidacaoReport,getEstagiarioProfessor } from "../../api/report";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -21,31 +22,30 @@ const InternshipReport = () => {
   const [isSupervisorDisabled, setIsSupervisorDisabled] = useState(false);
 
   useEffect(() => {
-    // Obtém o token da sessão (aqui depende de onde está armazenado, como no localStorage ou sessionStorage)
     const token = localStorage.getItem("authToken");
 
     if (token) {
       const decodedToken = jwtDecode(token);
 
       if (true /*decodedToken.perfil === "professor"*/) {
-        // Se o perfil for "professor", preenche o campo e o desabilita
         form.setFieldsValue({ supervisor: "Seu Nome" });
         setIsSupervisorDisabled(true);
       }
     }
+
+    var Dados = ValidacaoReport();
+    console.log("dados: ", Dados);
   }, [form]);
 
   const handleSubmit = (values) => {
     console.log("Relatório de Estágio salvo:", values);
     message.success("Relatório de Estágio salvo com sucesso!");
-    // Aqui você pode enviar os dados para uma API ou realizar outra ação
   };
 
   const handlePrint = async () => {
     const values = await form.validateFields();
     const doc = new jsPDF();
 
-    // Configurações iniciais do PDF
     doc.setFontSize(12);
     doc.text("Relatório de Estágio", 10, 10);
     doc.text(`Data: ${values.date.format("DD/MM/YYYY")}`, 10, 20);
@@ -53,21 +53,18 @@ const InternshipReport = () => {
     doc.text(`Supervisor: ${values.supervisor}`, 10, 40);
     doc.text(`Área de Atuação: ${values.area}`, 10, 50);
 
-    // Tratamento da caixa de feedback com quebra de linha
     const feedback = doc.splitTextToSize(
       `Feedback do Supervisor: ${values.feedback}`,
       180
     );
     doc.text(feedback, 10, 60);
 
-    // Tratamento da caixa de atividades com quebra de linha
     const activities = doc.splitTextToSize(
       `Atividades Realizadas: ${values.activities}`,
       180
     );
     doc.text(activities, 10, 90);
 
-    // Gera o PDF e faz o download
     doc.save("Relatorio_Estagio.pdf");
   };
 
@@ -80,9 +77,7 @@ const InternshipReport = () => {
             <Form.Item
               name="date"
               label="Data"
-              rules={[
-                { required: true, message: "Por favor, selecione a data!" },
-              ]}
+              rules={[{ required: true, message: "Por favor, selecione a data!" }]}
             >
               <DatePicker
                 format="DD/MM/YYYY"
@@ -94,25 +89,19 @@ const InternshipReport = () => {
             <Form.Item
               name="internName"
               label="Nome do Estagiário"
-              rules={[
-                {
-                  required: true,
-                  message: "Por favor, insira o nome do estagiário!",
-                },
-              ]}
+              rules={[{ required: true, message: "Por favor, selecione o estagiário!" }]}
             >
-              <Input placeholder="Digite o nome do estagiário" />
+              <Select placeholder="Selecione o estagiário">
+                <Option value="estagiario1">Ana Souza</Option>
+                <Option value="estagiario2">Pedro Lima</Option>
+                <Option value="estagiario3">Maria Santos</Option>
+              </Select>
             </Form.Item>
 
             <Form.Item
               name="supervisor"
               label="Supervisor Responsável"
-              rules={[
-                {
-                  required: true,
-                  message: "Por favor, selecione o supervisor!",
-                },
-              ]}
+              rules={[{ required: true, message: "Por favor, selecione o supervisor!" }]}
             >
               <Select
                 placeholder="Selecione o supervisor"
@@ -126,12 +115,7 @@ const InternshipReport = () => {
             <Form.Item
               name="area"
               label="Área de Atuação"
-              rules={[
-                {
-                  required: true,
-                  message: "Por favor, selecione a área de atuação!",
-                },
-              ]}
+              rules={[{ required: true, message: "Por favor, selecione a área de atuação!" }]}
             >
               <Select placeholder="Selecione a área de atuação">
                 <Option value="psicologia">Psicologia</Option>
@@ -154,12 +138,7 @@ const InternshipReport = () => {
             <Form.Item
               name="activities"
               label="Atividades Realizadas"
-              rules={[
-                {
-                  required: true,
-                  message: "Por favor, descreva as atividades realizadas!",
-                },
-              ]}
+              rules={[{ required: true, message: "Por favor, descreva as atividades realizadas!" }]}
             >
               <TextArea
                 rows={5}
@@ -171,12 +150,7 @@ const InternshipReport = () => {
             <Form.Item
               name="feedback"
               label="Feedback do Supervisor"
-              rules={[
-                {
-                  required: true,
-                  message: "Por favor, insira o feedback do supervisor!",
-                },
-              ]}
+              rules={[{ required: true, message: "Por favor, insira o feedback do supervisor!" }]}
             >
               <TextArea
                 rows={5}

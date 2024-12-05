@@ -6,7 +6,7 @@ const userModel = require('../models/userModel');
 // Função de login:
 const userLogin = async (request, response) => {
     const { email, password } = request.body;
-
+    console.log("controller user login ")
     try {
         // Verifique se o usuário existe e email:
         const user = await userModel.getUserByEmail(email);
@@ -38,7 +38,9 @@ const userLogin = async (request, response) => {
             process.env.JWT_SECRET_KEY,
             { expiresIn: '1h' }
         );
+        request.session.User = user;
 
+        console.log("request.session.User: ", request.session.User)
         // Retorna o token:
         return response.status(200).json({ token });
     } catch (error) {

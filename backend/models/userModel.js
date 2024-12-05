@@ -179,6 +179,7 @@ const getUserById = async (userId) => {
         return { success: true, data: user[0] };
     } catch (error) {
         console.error("Erro ao buscar usuário:", error);
+        console.log("erro: ", error.message)
         return { success: false, message: "Erro ao buscar usuário", details: error.message };
     }
 };

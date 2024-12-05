@@ -38,6 +38,7 @@ const RegisterUser = () => {
 
   const handleSubmit = async (registerFormValues) => {
     // Combina os dados da segunda etapa com os da primeira
+    console.log("register: ", registerFormValues);
     try {
       const perfilSelecionado = registerFormValues.perfil;
       const [key, label] = perfilSelecionado.split("|");

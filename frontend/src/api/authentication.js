@@ -1,9 +1,11 @@
 const backendUrl = "https://siac-api.ddns.net";
+const localUrl = "http://localhost:5000"
 
 const apiLogin = async (email, password) => {
   try {
-    const response = await fetch(`${backendUrl}/auth/login`, {
+    const response = await fetch(`${localUrl}/auth/login`, {
       method: "POST",
+      credentials: 'include', 
       headers: {
         "Content-Type": "application/json",
       },
@@ -15,6 +17,7 @@ const apiLogin = async (email, password) => {
     }
 
     const data = await response.json();
+    console.log("data: ", data);
     // Armazena JWT no localStorage:
     localStorage.setItem("authToken", data.token);
     return data;
