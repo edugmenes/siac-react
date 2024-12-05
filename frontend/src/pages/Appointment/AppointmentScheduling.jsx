@@ -15,29 +15,22 @@ import dayjs from "dayjs";
 import "antd/dist/reset.css";
 import ptBR from "antd/lib/locale/pt_BR";
 import { getUsersByRole } from "../../api/user";
-import { apiAppointmentScheduling } from "../../api/appointment";
-import { fetchAvailableAgenda } from "../../api/agenda";
+import {
+  apiAppointmentScheduling,
+  getDatesAvailableToScheduling,
+  getAvailableHoursToScheduling,
+} from "../../api/appointment";
 
 const AppointmentScheduling = () => {
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [doctors, setDoctors] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [availableProfessionals, setAvailableProfessionals] = useState([]);
+  const [availableHours, setAvailableHours] = useState([]); // Estado para armazenar os horários disponíveis
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const response = await getUsersByRole(5);
-        const doctorsToDropdown = response.data.map((d) => ({
-          label: d.nome,
-          value: d.idUser,
-        }));
-        setDoctors(doctorsToDropdown);
-      } catch (error) {
-        console.error("Erro ao buscar psicólogos:", error);
-      }
-    };
-
     // Mock para as salas
     const mockRooms = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"].map(
       (room) => ({
@@ -47,19 +40,73 @@ const AppointmentScheduling = () => {
     );
     setRooms(mockRooms);
 
-    fetchDoctors();
+    // Requisição para obter as datas disponíveis
+    const fetchAvailableDates = async () => {
+      try {
+        const data = await getDatesAvailableToScheduling();
+
+        if (data.success) {
+          setAvailableDates(data.data);
+        } else {
+          notification.error({
+            message: "Erro",
+            description: data.message,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao buscar datas disponíveis:", error);
+      }
+    };
+
+    fetchAvailableDates();
   }, []);
 
   const handleDateChange = (value) => {
     setSelectedDate(value);
+
+    // Filtra os profissionais disponíveis para a data selecionada
+    const selectedDateString = value.format("YYYY-MM-DD");
+    const filteredProfessionals = availableDates
+      .filter(
+        (item) => dayjs(item.data).format("YYYY-MM-DD") === selectedDateString
+      )
+      .map((item) => ({
+        label: item.nome,
+        value: item.idPsico,
+      }));
+
+    setAvailableProfessionals(filteredProfessionals); // Atualiza os profissionais disponíveis
   };
 
-  const handleTimeChange = (value) => {
-    setSelectedTime(value);
-  };
+  const handleProfessionalChange = async (value) => {
+    setSelectedProfessional(value);
 
-  const handleProfessionalChange = (value) => {
-    console.log(value);
+    // Obter os horários disponíveis para o profissional selecionado
+    const selectedProfessionalData = availableDates.filter(
+      (item) => item.idPsico === value
+    );
+
+    if (selectedProfessionalData.length > 0) {
+      const idAgenda = selectedProfessionalData[0].idAgenda;
+
+      try {
+        const response = await getAvailableHoursToScheduling(idAgenda);
+        if (response.success) {
+          const formattedHours = response.data.map((item) => {
+            const hour = dayjs(item.hora, "HH:mm:ss").format("HH:mm"); // Formata para HH:mm
+            return hour;
+          });
+          setAvailableHours(formattedHours); // Atualiza os horários disponíveis
+        } else {
+          notification.error({
+            message: "Erro",
+            description: response.message,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao buscar horários disponíveis:", error);
+      }
+    }
   };
 
   const handleSubmit = async (values) => {
@@ -110,7 +157,11 @@ const AppointmentScheduling = () => {
   };
 
   const disabledDate = (current) => {
-    return current && current < dayjs().startOf("day");
+    // Desabilita datas que não estão na lista de datas disponíveis
+    return (
+      current &&
+      !availableDates.some((date) => dayjs(date.data).isSame(current, "day"))
+    );
   };
 
   return (
@@ -139,30 +190,6 @@ const AppointmentScheduling = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label="Selecione o horário:"
-                name="time"
-                rules={[{ required: true, message: "Selecione um horário" }]}
-              >
-                <DatePicker
-                  picker="time"
-                  onChange={handleTimeChange}
-                  showTime={{
-                    hideDisabledOptions: true,
-                    disabledHours,
-                    disabledMinutes,
-                  }}
-                  format="HH:mm"
-                  style={{ width: "100%" }}
-                  size="large"
-                  placeholder="Selecione a hora"
-                  disabled={!selectedDate}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
                 label="Selecione o profissional:"
                 name="professional"
                 rules={[
@@ -174,8 +201,28 @@ const AppointmentScheduling = () => {
                   onChange={handleProfessionalChange}
                   size="large"
                   placeholder="Selecione o profissional"
-                  options={doctors}
-                  disabled={!selectedDate || !selectedTime}
+                  options={availableProfessionals} // Usa os profissionais disponíveis para a data
+                  disabled={!selectedDate}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Selecione o horário:"
+                name="time"
+                rules={[{ required: true, message: "Selecione um horário" }]}
+              >
+                <Select
+                  style={{ width: "100%" }}
+                  size="large"
+                  placeholder="Selecione o horário"
+                  options={availableHours.map((hora) => ({
+                    label: hora,
+                    value: hora,
+                  }))}
+                  disabled={!selectedDate || !selectedProfessional}
                 />
               </Form.Item>
             </Col>
@@ -190,7 +237,7 @@ const AppointmentScheduling = () => {
                   size="large"
                   placeholder="Selecione a sala"
                   options={rooms}
-                  disabled={!selectedDate || !selectedTime}
+                  disabled={!selectedDate || !selectedProfessional}
                 />
               </Form.Item>
             </Col>

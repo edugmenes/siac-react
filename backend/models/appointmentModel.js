@@ -58,53 +58,67 @@ const registerHours = async (formValues, idUser, idAgenda) => {
   }
 };
 
-const registerAgendaHours = async (formValues, idUser, idAgenda) => {
-  const { professional, initialTime, finalTime, breakStart, breakEnd } = formValues;
-  const patient = idUser;
-  const agenda = idAgenda;
-
+const getAppointmentDatesAvailable = async () => {
   try {
-    // Converte horários para objetos Date para facilitar os cálculos
-    const startTime = new Date(`1970-01-01T${initialTime}:00`);
-    const endTime = new Date(`1970-01-01T${finalTime}:00`);
-    const lunchStart = new Date(`1970-01-01T${breakStart}:00`);
-    const lunchEnd = new Date(`1970-01-01T${breakEnd}:00`);
+    // Executando a consulta no banco de dados
+    const [appointments] = await promisePool.query(
+      `
+        SELECT DISTINCT 
+            a.data, a.idAgenda, h.idPsico, u.nome
+        FROM 
+            agenda a
+        INNER JOIN 
+            horario h 
+        ON 
+            a.idAgenda = h.idAgenda
+        INNER JOIN 
+            usuario u 
+        ON 
+            h.idPsico = u.idUser
+        WHERE 
+            h.disponibilidade = 0;
+      `
+    );
 
-    const horarios = []; // Lista para armazenar os horários a serem inseridos
-    let currentTime = startTime;
-
-    while (currentTime < endTime) {
-
-      // Ignorar horários no intervalo de almoço
-      if (currentTime >= lunchStart && currentTime < lunchEnd) {
-        currentTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // Pula uma hora
-        continue;
-      }
-
-      horarios.push(currentTime.toTimeString().slice(0, 5)); // Formata para "HH:MM"
-      currentTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // Adiciona 1 hora
+    if (!Array.isArray(appointments) || appointments.length === 0) {
+      return { success: false, message: "Nenhuma consulta encontrada" };
     }
 
-    // Prepara os valores para inserir na tabela horario
-    const insertPromises = horarios.map(async (hora) => {
-      return promisePool.query(
-        `INSERT INTO horario (hora, idUser, disponibilidade, idAgenda, idPsico, status) VALUES (?, ?, ?, ?, ?, ?)`,
-        [hora, null, 0, agenda, professional, "Disponível"]
-      );
-    });
-
-    // Executa todas as inserções em paralelo
-    await Promise.all(insertPromises);
-
-    return {
-      success: true,
-      message: "Horários criados com sucesso!",
-    };
+    return { success: true, data: appointments, message: "Consultas encontradas com sucesso" };
   } catch (error) {
-    console.error("Erro ao cadastrar horários:", error);
+    console.error("Erro ao buscar consultas: ", error);
+
     return {
       success: false,
-      message: "Erro ao cadastrar horários",
+      message: "Erro ao buscar consultas",
+      details: error.message,
+    };
+  }
+};
+
+const getAgendaAvailableHours = async (idAgenda) => {
+  try {
+    // Executando a consulta no banco de dados
+    const [hours] = await promisePool.query(
+      `
+        SELECT hora 
+        FROM horario 
+        WHERE idAgenda = ?
+        AND disponibilidade = 0; 
+      `, [idAgenda]
+    );
+
+    if (!Array.isArray(hours) || hours.length === 0) {
+      return { success: false, message: "Nenhum horário encontrado." };
+    }
+
+    return { success: true, data: hours, message: "Horários encontrados com sucesso." };
+  } catch (error) {
+    console.error("Erro ao buscar horários: ", error);
+
+    return {
+      success: false,
+      message: "Erro ao buscar horários.",
       details: error.message,
     };
   }
@@ -203,5 +217,7 @@ module.exports = {
   registerHours,
   getAppointments,
   getAppointmentsById,
-  deleteAppointment
+  deleteAppointment,
+  getAppointmentDatesAvailable,
+  getAgendaAvailableHours
 };

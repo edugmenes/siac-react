@@ -69,6 +69,46 @@ const getAppointmentById = async (recordId) => {
   }
 }
 
+const getDatesAvailableToScheduling = async () => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/available/dates`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
+const getAvailableHoursToScheduling = async (idAgenda) => {
+  try {
+    const response = await fetch(`${backendUrl}/appointment/get/hours/${idAgenda}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erro ao agendar consulta:', error);
+  }
+}
+
 const deleteAppointment = async (idHorario) => {
   try {
     const response = await fetch(`${backendUrl}/appointment/delete`, {
@@ -121,5 +161,7 @@ module.exports = {
   updateAppointment,
   getAppointments,
   getAppointmentById,
-  deleteAppointment
+  deleteAppointment,
+  getDatesAvailableToScheduling,
+  getAvailableHoursToScheduling
 };

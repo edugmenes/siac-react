@@ -192,6 +192,46 @@ const getAppointmentsById = async (request, response) => {
     }
 };
 
+const getDatesAvailableToScheduling = async (request, response) => {
+    try {
+        const datesAvailable = await appointmentModel.getAppointmentDatesAvailable();
+
+        if (!datesAvailable || datesAvailable.length === 0) {
+            console.log('No appointments found.');
+            return response.status(404).json({ message: 'Nenhuma consulta encontrada' });
+        }
+
+        response.status(200).json(datesAvailable);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        response.status(500).json({
+            message: 'Não foi possível buscar consultas',
+            details: error.message,
+        });
+    }
+}
+
+const getAvailableHoursToScheduling = async (request, response) => {
+    const { idAgenda } = request.params;
+
+    try {
+        const hoursAvailable = await appointmentModel.getAgendaAvailableHours(idAgenda);
+
+        if (!hoursAvailable || hoursAvailable.length === 0) {
+            console.log('No hours found.');
+            return response.status(404).json({ message: 'Nenhum horário encontrado.' });
+        }
+
+        response.status(200).json(hoursAvailable);
+    } catch (error) {
+        console.error('Error fetching appointments:', error);
+        response.status(500).json({
+            message: 'Não foi possível buscar horários',
+            details: error.message,
+        });
+    }
+}
+
 const deleteAppointment = async (request, response) => {
     const { idHorario } = request.body;
 
@@ -213,5 +253,7 @@ module.exports = {
     agendaCreation,
     getAppointments,
     getAppointmentsById,
-    deleteAppointment
+    deleteAppointment,
+    getDatesAvailableToScheduling,
+    getAvailableHoursToScheduling
 };

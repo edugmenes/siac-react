@@ -6,7 +6,9 @@ const {
     appointmentRescheduling,
     deleteAppointment,
     getAppointments,
-    getAppointmentsById
+    getAppointmentsById,
+    getDatesAvailableToScheduling,
+    getAvailableHoursToScheduling
 } = require('../controllers/appointmentController');
 
 
@@ -14,6 +16,8 @@ const {
 router.post('/scheduling', authenticateToken, appointmentScheduling);
 router.put('/rescheduling/:recordId', authenticateToken, appointmentRescheduling);
 router.get('/get', getAppointments)
+router.get('/get/available/dates', getDatesAvailableToScheduling)
+router.get('/get/hours/:idAgenda', getAvailableHoursToScheduling)
 router.get('/get/:recordId', getAppointmentsById)
 router.delete('/delete', deleteAppointment)
 
