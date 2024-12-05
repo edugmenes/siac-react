@@ -226,7 +226,7 @@ const AppointmentRescheduling = () => {
   return (
     <>
       <Typography.Title level={2} style={{ marginBottom: "40px" }}>
-        Agendar Consulta
+        Remarcar Consulta
       </Typography.Title>
       <Form layout="vertical" onFinish={handleSubmit}>
         <ConfigProvider locale={ptBR}>
