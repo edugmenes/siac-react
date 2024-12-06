@@ -74,7 +74,7 @@ const Login = () => {
             marginBottom: "20px",
           }}
         >
-          Sistema Integrado de Atendimento às Clínicas
+          Sistema Integrado de Assistência às Clínicas
         </Text>
         <Text
           style={{
