@@ -58,6 +58,37 @@ const updateHourStatus = async (hourValues) => {
   }
 };
 
+const setHourAvailable = async (hourValues) => {
+  console.log("Chegou na model: ", hourValues);
+  const { idHorario } = hourValues;
+
+  try {
+    const [result] = await promisePool.query(
+      `UPDATE horario SET idUser = NULL, disponibilidade = 0, status = 'Disponível', sala = NULL WHERE idHorario = ?`,
+      [idHorario]
+    );
+
+    if (result.affectedRows > 0) {
+      return {
+        success: true,
+        message: "Horário atualizado com sucesso!",
+      };
+    } else {
+      return {
+        success: false,
+        message: "Horário não encontrado para atualização.",
+      };
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar horário:", error);
+    return {
+      success: false,
+      message: "Erro ao atualizar horário",
+      details: error.message,
+    };
+  }
+}
+
 const registerHours = async (formValues, idUser, idAgenda) => {
   const { professional, initialTime, disponibilidade, status } = formValues;
   const patient = idUser;
@@ -283,5 +314,6 @@ module.exports = {
   deleteAppointment,
   getAppointmentDatesAvailable,
   getAgendaAvailableHours,
-  getAgendaAvailablePsicos
+  getAgendaAvailablePsicos,
+  setHourAvailable
 };

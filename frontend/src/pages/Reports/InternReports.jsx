@@ -106,6 +106,7 @@ const InternshipReport = () => {
                 format="DD/MM/YYYY"
                 style={{ width: "100%" }}
                 placeholder="Selecione a data"
+                size="large"
               />
             </Form.Item>
 
@@ -127,6 +128,7 @@ const InternshipReport = () => {
               <Select
                 placeholder="Selecione o supervisor"
                 disabled={isSupervisorDisabled}
+                size="large"
               >
                 <option value="">Selecione</option>
                 {usersSupervisors.map(supervisor => (
@@ -143,18 +145,22 @@ const InternshipReport = () => {
               label="Área de Atuação"
               rules={[{ required: true, message: "Por favor, selecione a área de atuação!" }]}
             >
-              <Select placeholder="Selecione a área de atuação">
+              <Select placeholder="Selecione a área de atuação" size="large">
                 <Option value="psicologia">Psicologia</Option>
                 <Option value="fonoaudiologia">Fonoaudiologia</Option>
                 <Option value="terapia ocupacional">Terapia Ocupacional</Option>
               </Select>
             </Form.Item>
-
+            <Divider />
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" size="large">
                 Salvar Relatório
               </Button>
-              <Button style={{ marginLeft: 10 }} onClick={handlePrint}>
+              <Button
+                style={{ marginLeft: 10 }}
+                onClick={handlePrint}
+                size="large"
+              >
                 Imprimir em PDF
               </Button>
             </Form.Item>
@@ -168,7 +174,7 @@ const InternshipReport = () => {
             >
               <TextArea
                 rows={5}
-                autoSize={{ minRows: 5, maxRows: 10 }}
+                autoSize={{ minRows: 5.65, maxRows: 10 }}
                 placeholder="Descreva as atividades realizadas pelo estagiário"
               />
             </Form.Item>
@@ -180,7 +186,7 @@ const InternshipReport = () => {
             >
               <TextArea
                 rows={5}
-                autoSize={{ minRows: 5, maxRows: 10 }}
+                autoSize={{ minRows: 5.65, maxRows: 10 }}
                 placeholder="Digite o feedback do supervisor sobre o desempenho do estagiário"
               />
             </Form.Item>
